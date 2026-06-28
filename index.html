@@ -1,1682 +1,1682 @@
-  <!DOCTYPE html>
-  <html lang="es">
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Semana 12 – Respaldo y Recuperación | Base de Datos II</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 12 – Respaldo y Recuperación | Base de Datos II</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap');
 
-    :root {
-      --teal:   #2BA99B;
-      --indigo: #5B7CFA;
-      --coral:  #FA7C5B;
-      --sage:   #6DB56A;
-      --plum:   #9B6EC4;
-      --amber:  #F0A500;
-      --bg-teal:   #E6F7F5;
-      --bg-indigo: #EEF2FF;
-      --bg-coral:  #FFF2EE;
-      --bg-sage:   #EEF8EE;
-      --bg-plum:   #F5EEFF;
-      --bg-amber:  #FFF8E6;
-      --card-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Poppins',sans-serif; background:#F6F8FC; color:#333; overflow-x:hidden; }
+  :root {
+    --teal:   #2BA99B;
+    --indigo: #5B7CFA;
+    --coral:  #FA7C5B;
+    --sage:   #6DB56A;
+    --plum:   #9B6EC4;
+    --amber:  #F0A500;
+    --bg-teal:   #E6F7F5;
+    --bg-indigo: #EEF2FF;
+    --bg-coral:  #FFF2EE;
+    --bg-sage:   #EEF8EE;
+    --bg-plum:   #F5EEFF;
+    --bg-amber:  #FFF8E6;
+    --card-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Poppins',sans-serif; background:#F6F8FC; color:#333; overflow-x:hidden; }
 
-    /* ── HERO ── */
-    .hero {
-      background:linear-gradient(135deg,#0B3D3A 0%,#1A7A6E 55%,#2BA99B 100%);
-      color:white; padding:50px 40px 60px; text-align:center; position:relative; overflow:hidden;
-    }
-    .hero::before {
-      content:''; position:absolute; inset:0;
-      background:url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    }
-    .hero-badge {
-      display:inline-block; background:rgba(255,255,255,0.18);
-      border:1px solid rgba(255,255,255,0.35); border-radius:50px;
-      padding:6px 20px; font-size:0.75rem; font-weight:600;
-      letter-spacing:2px; text-transform:uppercase; margin-bottom:18px;
-    }
-    .hero h1 { font-size:clamp(1.8rem,4vw,3rem); font-weight:800; letter-spacing:-0.5px; margin-bottom:14px; }
-    .hero h1 span { color:#72F0E4; }
-    .hero p { font-size:0.95rem; opacity:0.88; max-width:680px; margin:0 auto 24px; line-height:1.7; }
-    .hero-meta { display:flex; justify-content:center; gap:24px; flex-wrap:wrap; }
-    .hero-meta span { background:rgba(255,255,255,0.15); border-radius:8px; padding:6px 16px; font-size:0.8rem; font-weight:600; }
+  /* ── HERO ── */
+  .hero {
+    background:linear-gradient(135deg,#0B3D3A 0%,#1A7A6E 55%,#2BA99B 100%);
+    color:white; padding:50px 40px 60px; text-align:center; position:relative; overflow:hidden;
+  }
+  .hero::before {
+    content:''; position:absolute; inset:0;
+    background:url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-badge {
+    display:inline-block; background:rgba(255,255,255,0.18);
+    border:1px solid rgba(255,255,255,0.35); border-radius:50px;
+    padding:6px 20px; font-size:0.75rem; font-weight:600;
+    letter-spacing:2px; text-transform:uppercase; margin-bottom:18px;
+  }
+  .hero h1 { font-size:clamp(1.8rem,4vw,3rem); font-weight:800; letter-spacing:-0.5px; margin-bottom:14px; }
+  .hero h1 span { color:#72F0E4; }
+  .hero p { font-size:0.95rem; opacity:0.88; max-width:680px; margin:0 auto 24px; line-height:1.7; }
+  .hero-meta { display:flex; justify-content:center; gap:24px; flex-wrap:wrap; }
+  .hero-meta span { background:rgba(255,255,255,0.15); border-radius:8px; padding:6px 16px; font-size:0.8rem; font-weight:600; }
 
-    /* ── NAV ── */
-    .nav-wrap { background:white; box-shadow:0 2px 12px rgba(0,0,0,0.07); position:sticky; top:0; z-index:100; }
-    .nav-tabs { display:flex; overflow-x:auto; gap:4px; padding:10px 20px; max-width:1100px; margin:0 auto; scrollbar-width:none; }
-    .nav-tabs::-webkit-scrollbar { display:none; }
-    .tab-btn {
-      flex-shrink:0; background:none; border:none; padding:8px 16px; border-radius:30px;
-      font-family:'Poppins',sans-serif; font-size:0.78rem; font-weight:600;
-      cursor:pointer; transition:all .25s; color:#777; white-space:nowrap;
-    }
-    .tab-btn:hover { background:#F0FBF9; color:#2BA99B; }
-    .tab-btn.active { background:#2BA99B; color:white; }
-    .tab-btn.t2.active { background:#5B7CFA; }
-    .tab-btn.t3.active { background:#6DB56A; }
-    .tab-btn.t4.active { background:#F0A500; color:#333; }
-    .tab-btn.t5.active { background:#9B6EC4; }
-    .tab-btn.t6.active { background:#FA7C5B; }
+  /* ── NAV ── */
+  .nav-wrap { background:white; box-shadow:0 2px 12px rgba(0,0,0,0.07); position:sticky; top:0; z-index:100; }
+  .nav-tabs { display:flex; overflow-x:auto; gap:4px; padding:10px 20px; max-width:1100px; margin:0 auto; scrollbar-width:none; }
+  .nav-tabs::-webkit-scrollbar { display:none; }
+  .tab-btn {
+    flex-shrink:0; background:none; border:none; padding:8px 16px; border-radius:30px;
+    font-family:'Poppins',sans-serif; font-size:0.78rem; font-weight:600;
+    cursor:pointer; transition:all .25s; color:#777; white-space:nowrap;
+  }
+  .tab-btn:hover { background:#F0FBF9; color:#2BA99B; }
+  .tab-btn.active { background:#2BA99B; color:white; }
+  .tab-btn.t2.active { background:#5B7CFA; }
+  .tab-btn.t3.active { background:#6DB56A; }
+  .tab-btn.t4.active { background:#F0A500; color:#333; }
+  .tab-btn.t5.active { background:#9B6EC4; }
+  .tab-btn.t6.active { background:#FA7C5B; }
 
-    /* ── MAIN ── */
-    .main { max-width:1100px; margin:0 auto; padding:30px 20px 60px; }
-    .section { display:none; }
-    .section.active { display:block; }
+  /* ── MAIN ── */
+  .main { max-width:1100px; margin:0 auto; padding:30px 20px 60px; }
+  .section { display:none; }
+  .section.active { display:block; }
 
-    /* ── INFOG HEADER ── */
-    .infog-header {
-      display:flex; align-items:center; gap:16px;
-      margin-bottom:28px; padding:20px 24px; border-radius:16px; color:white;
-    }
-    .infog-header .icon { font-size:2.4rem; }
-    .infog-header h2 { font-size:1.3rem; font-weight:700; }
-    .infog-header p { font-size:0.82rem; opacity:0.9; margin-top:3px; }
+  /* ── INFOG HEADER ── */
+  .infog-header {
+    display:flex; align-items:center; gap:16px;
+    margin-bottom:28px; padding:20px 24px; border-radius:16px; color:white;
+  }
+  .infog-header .icon { font-size:2.4rem; }
+  .infog-header h2 { font-size:1.3rem; font-weight:700; }
+  .infog-header p { font-size:0.82rem; opacity:0.9; margin-top:3px; }
 
-    .h-teal   { background:linear-gradient(135deg,#0B7A70,#2BA99B); }
-    .h-indigo { background:linear-gradient(135deg,#3655D4,#5B7CFA); }
-    .h-sage   { background:linear-gradient(135deg,#3D8B3A,#6DB56A); }
-    .h-amber  { background:linear-gradient(135deg,#B07800,#F0A500); color:#111 !important; }
-    .h-plum   { background:linear-gradient(135deg,#6A4A9E,#9B6EC4); }
-    .h-coral  { background:linear-gradient(135deg,#C44A2C,#FA7C5B); }
+  .h-teal   { background:linear-gradient(135deg,#0B7A70,#2BA99B); }
+  .h-indigo { background:linear-gradient(135deg,#3655D4,#5B7CFA); }
+  .h-sage   { background:linear-gradient(135deg,#3D8B3A,#6DB56A); }
+  .h-amber  { background:linear-gradient(135deg,#B07800,#F0A500); color:#111 !important; }
+  .h-plum   { background:linear-gradient(135deg,#6A4A9E,#9B6EC4); }
+  .h-coral  { background:linear-gradient(135deg,#C44A2C,#FA7C5B); }
 
-    /* ── CARDS ── */
-    .infog-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; margin-bottom:40px; }
-    .infog-card {
-      background:white; border-radius:16px; padding:22px 20px;
-      box-shadow:var(--card-shadow); border-top:4px solid transparent;
-      transition:transform .2s,box-shadow .2s; position:relative; overflow:hidden;
-    }
-    .infog-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(0,0,0,0.12); }
-    .infog-card::before { content:''; position:absolute; top:0; right:0; width:80px; height:80px; border-radius:0 0 0 80px; opacity:.08; }
+  /* ── CARDS ── */
+  .infog-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; margin-bottom:40px; }
+  .infog-card {
+    background:white; border-radius:16px; padding:22px 20px;
+    box-shadow:var(--card-shadow); border-top:4px solid transparent;
+    transition:transform .2s,box-shadow .2s; position:relative; overflow:hidden;
+  }
+  .infog-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(0,0,0,0.12); }
+  .infog-card::before { content:''; position:absolute; top:0; right:0; width:80px; height:80px; border-radius:0 0 0 80px; opacity:.08; }
 
-    .c-teal   { border-color:#2BA99B; } .c-teal::before   { background:#2BA99B; }
-    .c-indigo { border-color:#5B7CFA; } .c-indigo::before { background:#5B7CFA; }
-    .c-sage   { border-color:#6DB56A; } .c-sage::before   { background:#6DB56A; }
-    .c-amber  { border-color:#F0A500; } .c-amber::before  { background:#F0A500; }
-    .c-plum   { border-color:#9B6EC4; } .c-plum::before   { background:#9B6EC4; }
-    .c-coral  { border-color:#FA7C5B; } .c-coral::before  { background:#FA7C5B; }
+  .c-teal   { border-color:#2BA99B; } .c-teal::before   { background:#2BA99B; }
+  .c-indigo { border-color:#5B7CFA; } .c-indigo::before { background:#5B7CFA; }
+  .c-sage   { border-color:#6DB56A; } .c-sage::before   { background:#6DB56A; }
+  .c-amber  { border-color:#F0A500; } .c-amber::before  { background:#F0A500; }
+  .c-plum   { border-color:#9B6EC4; } .c-plum::before   { background:#9B6EC4; }
+  .c-coral  { border-color:#FA7C5B; } .c-coral::before  { background:#FA7C5B; }
 
-    .card-emoji { font-size:1.8rem; margin-bottom:10px; display:block; }
-    .infog-card h3 { font-size:0.95rem; font-weight:700; color:#333; margin-bottom:8px; }
-    .infog-card p  { font-size:0.8rem; color:#666; line-height:1.65; }
-    .badge-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
-    .badge { font-size:0.68rem; font-weight:600; padding:3px 10px; border-radius:20px; }
-    .b-t { background:#E6F7F5; color:#0B7A70; }
-    .b-i { background:#EEF2FF; color:#3655D4; }
-    .b-s { background:#EEF8EE; color:#3D8B3A; }
-    .b-a { background:#FFF8E6; color:#B07800; }
-    .b-p { background:#F5EEFF; color:#6A4A9E; }
-    .b-c { background:#FFF2EE; color:#C44A2C; }
+  .card-emoji { font-size:1.8rem; margin-bottom:10px; display:block; }
+  .infog-card h3 { font-size:0.95rem; font-weight:700; color:#333; margin-bottom:8px; }
+  .infog-card p  { font-size:0.8rem; color:#666; line-height:1.65; }
+  .badge-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .badge { font-size:0.68rem; font-weight:600; padding:3px 10px; border-radius:20px; }
+  .b-t { background:#E6F7F5; color:#0B7A70; }
+  .b-i { background:#EEF2FF; color:#3655D4; }
+  .b-s { background:#EEF8EE; color:#3D8B3A; }
+  .b-a { background:#FFF8E6; color:#B07800; }
+  .b-p { background:#F5EEFF; color:#6A4A9E; }
+  .b-c { background:#FFF2EE; color:#C44A2C; }
 
-    /* ── BACKUP DIAGRAM ── */
-    .backup-diagram {
-      display:flex; align-items:center; gap:0;
-      background:white; border-radius:16px; padding:24px 28px;
-      box-shadow:var(--card-shadow); margin-bottom:30px; overflow-x:auto;
-    }
-    .bk-step {
-      display:flex; flex-direction:column; align-items:center; gap:8px;
-      min-width:110px; text-align:center;
-    }
-    .bk-icon {
-      width:56px; height:56px; border-radius:16px;
-      display:flex; align-items:center; justify-content:center;
-      font-size:1.6rem; box-shadow:0 4px 12px rgba(0,0,0,0.1);
-    }
-    .bk-label { font-size:0.72rem; font-weight:700; color:#444; }
-    .bk-sub   { font-size:0.65rem; color:#888; }
-    .bk-arrow { font-size:1.5rem; color:#ccc; padding:0 8px; flex-shrink:0; }
-    .bk-full   { background:#E6F7F5; }
-    .bk-diff   { background:#EEF2FF; }
-    .bk-log    { background:#EEF8EE; }
+  /* ── BACKUP DIAGRAM ── */
+  .backup-diagram {
+    display:flex; align-items:center; gap:0;
+    background:white; border-radius:16px; padding:24px 28px;
+    box-shadow:var(--card-shadow); margin-bottom:30px; overflow-x:auto;
+  }
+  .bk-step {
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    min-width:110px; text-align:center;
+  }
+  .bk-icon {
+    width:56px; height:56px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.6rem; box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  }
+  .bk-label { font-size:0.72rem; font-weight:700; color:#444; }
+  .bk-sub   { font-size:0.65rem; color:#888; }
+  .bk-arrow { font-size:1.5rem; color:#ccc; padding:0 8px; flex-shrink:0; }
+  .bk-full   { background:#E6F7F5; }
+  .bk-diff   { background:#EEF2FF; }
+  .bk-log    { background:#EEF8EE; }
 
-    /* ── PROYECTOS ── */
-    .proyecto-card { background:white; border-radius:16px; overflow:hidden; box-shadow:var(--card-shadow); margin-bottom:24px; }
-    .proyecto-header { display:flex; align-items:center; gap:14px; padding:18px 22px; cursor:pointer; user-select:none; transition:background .2s; }
-    .proyecto-header:hover { background:#FAFBFF; }
-    .proy-num { width:36px;height:36px; border-radius:50%; display:flex;align-items:center;justify-content:center; font-weight:800;font-size:0.9rem;color:white;flex-shrink:0; }
-    .proyecto-header h3 { font-size:0.95rem;font-weight:700;color:#333;flex:1; }
-    .proy-arrow { font-size:1rem;color:#aaa;transition:transform .3s; }
-    .proyecto-body { display:none; padding:0 22px 22px; }
-    .proyecto-body.open { display:block; }
-    .proy-arrow.open { transform:rotate(180deg); }
+  /* ── PROYECTOS ── */
+  .proyecto-card { background:white; border-radius:16px; overflow:hidden; box-shadow:var(--card-shadow); margin-bottom:24px; }
+  .proyecto-header { display:flex; align-items:center; gap:14px; padding:18px 22px; cursor:pointer; user-select:none; transition:background .2s; }
+  .proyecto-header:hover { background:#FAFBFF; }
+  .proy-num { width:36px;height:36px; border-radius:50%; display:flex;align-items:center;justify-content:center; font-weight:800;font-size:0.9rem;color:white;flex-shrink:0; }
+  .proyecto-header h3 { font-size:0.95rem;font-weight:700;color:#333;flex:1; }
+  .proy-arrow { font-size:1rem;color:#aaa;transition:transform .3s; }
+  .proyecto-body { display:none; padding:0 22px 22px; }
+  .proyecto-body.open { display:block; }
+  .proy-arrow.open { transform:rotate(180deg); }
 
-    .apartados { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
-    @media(max-width:640px){ .apartados { grid-template-columns:1fr; } }
+  .apartados { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+  @media(max-width:640px){ .apartados { grid-template-columns:1fr; } }
 
-    .apartado { border-radius:12px; padding:14px 16px; }
-    .ap1 { background:#E6F7F5; border-left:4px solid #2BA99B; }
-    .ap2 { background:#1A1A2E; border-left:4px solid #72F0E4; grid-column:1/-1; }
-    .ap3 { background:#EEF8EE; border-left:4px solid #6DB56A; }
-    .ap4 { background:#FFF8E6; border-left:4px solid #F0A500; }
+  .apartado { border-radius:12px; padding:14px 16px; }
+  .ap1 { background:#E6F7F5; border-left:4px solid #2BA99B; }
+  .ap2 { background:#1A1A2E; border-left:4px solid #72F0E4; grid-column:1/-1; }
+  .ap3 { background:#EEF8EE; border-left:4px solid #6DB56A; }
+  .ap4 { background:#FFF8E6; border-left:4px solid #F0A500; }
 
-    .apartado h4 { font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px; }
-    .ap1 h4 { color:#0B7A70; }
-    .ap2 h4 { color:#72F0E4; }
-    .ap3 h4 { color:#3D8B3A; }
-    .ap4 h4 { color:#B07800; }
-    .apartado p,.apartado li { font-size:0.8rem;line-height:1.65;color:#555; }
-    .ap2 p,.ap2 li { color:#B0C4D8; }
-    .apartado ul { padding-left:16px; }
-    .apartado li { margin-bottom:3px; }
+  .apartado h4 { font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px; }
+  .ap1 h4 { color:#0B7A70; }
+  .ap2 h4 { color:#72F0E4; }
+  .ap3 h4 { color:#3D8B3A; }
+  .ap4 h4 { color:#B07800; }
+  .apartado p,.apartado li { font-size:0.8rem;line-height:1.65;color:#555; }
+  .ap2 p,.ap2 li { color:#B0C4D8; }
+  .apartado ul { padding-left:16px; }
+  .apartado li { margin-bottom:3px; }
 
-    pre { font-family:'Fira Code',monospace;font-size:0.74rem;line-height:1.7;color:#C9D1D9;white-space:pre-wrap;word-break:break-word; }
-    .kw  { color:#7DE8E8; font-weight:600; }
-    .fn  { color:#79E8A0; }
-    .str { color:#F1FA8C; }
-    .cm  { color:#5A6A80; font-style:italic; }
-    .num { color:#BD93F9; }
-    .tbl { color:#8BE9FD; }
-    .kw2 { color:#FF9F7E; }
+  pre { font-family:'Fira Code',monospace;font-size:0.74rem;line-height:1.7;color:#C9D1D9;white-space:pre-wrap;word-break:break-word; }
+  .kw  { color:#7DE8E8; font-weight:600; }
+  .fn  { color:#79E8A0; }
+  .str { color:#F1FA8C; }
+  .cm  { color:#5A6A80; font-style:italic; }
+  .num { color:#BD93F9; }
+  .tbl { color:#8BE9FD; }
+  .kw2 { color:#FF9F7E; }
 
-    .section-divider { text-align:center;padding:10px 0 20px;font-size:0.75rem;color:#aaa;font-weight:600;letter-spacing:2px;text-transform:uppercase; }
+  .section-divider { text-align:center;padding:10px 0 20px;font-size:0.75rem;color:#aaa;font-weight:600;letter-spacing:2px;text-transform:uppercase; }
 
-    /* ── COMPARE ── */
-    .compare-table { width:100%;border-collapse:separate;border-spacing:0;border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);margin:18px 0 30px;background:white; }
-    .compare-table th { background:#1A7A6E;color:white;padding:13px 16px;font-size:0.82rem;text-align:left;font-weight:600; }
-    .compare-table th:first-child { border-radius:12px 0 0 0; }
-    .compare-table th:last-child  { border-radius:0 12px 0 0; }
-    .compare-table td { padding:11px 16px;font-size:0.8rem;color:#444;border-bottom:1px solid #F0F8F7;vertical-align:top; }
-    .compare-table tr:last-child td { border-bottom:none; }
-    .compare-table tr:nth-child(even) td { background:#F2FDFB; }
+  /* ── COMPARE ── */
+  .compare-table { width:100%;border-collapse:separate;border-spacing:0;border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);margin:18px 0 30px;background:white; }
+  .compare-table th { background:#1A7A6E;color:white;padding:13px 16px;font-size:0.82rem;text-align:left;font-weight:600; }
+  .compare-table th:first-child { border-radius:12px 0 0 0; }
+  .compare-table th:last-child  { border-radius:0 12px 0 0; }
+  .compare-table td { padding:11px 16px;font-size:0.8rem;color:#444;border-bottom:1px solid #F0F8F7;vertical-align:top; }
+  .compare-table tr:last-child td { border-bottom:none; }
+  .compare-table tr:nth-child(even) td { background:#F2FDFB; }
 
-    footer { background:linear-gradient(135deg,#0B3D3A,#1A7A6E);color:rgba(255,255,255,0.8);text-align:center;padding:30px 20px;font-size:0.82rem;margin-top:20px; }
-    footer strong { color:white; }
-  </style>
-  </head>
-  <body>
+  footer { background:linear-gradient(135deg,#0B3D3A,#1A7A6E);color:rgba(255,255,255,0.8);text-align:center;padding:30px 20px;font-size:0.82rem;margin-top:20px; }
+  footer strong { color:white; }
+</style>
+</head>
+<body>
 
-  <div class="hero">
-    <div class="hero-badge">🏫 Universidad Peruana Los Andes · Facultad de Ingeniería</div>
-    <h1>💾 Respaldo y <span>Recuperación</span></h1>
-    <p>Estrategias de backup, restauración y mantenimiento de copias de seguridad en Microsoft SQL Server para la base de datos <strong>GradosTitulos</strong>.</p>
-    <div class="hero-meta">
-      <span>📅 Semana 12</span>
-      <span>📚 Base de Datos II</span>
-      <span>🛢️ SQL Server</span>
-      <span>👨‍🏫 Mg. Ing. Raúl Fernández Bejarano</span>
+<div class="hero">
+  <div class="hero-badge">🏫 Universidad Peruana Los Andes · Facultad de Ingeniería</div>
+  <h1>💾 Respaldo y <span>Recuperación</span></h1>
+  <p>Estrategias de backup, restauración y mantenimiento de copias de seguridad en Microsoft SQL Server para la base de datos <strong>GradosTitulos</strong>.</p>
+  <div class="hero-meta">
+    <span>📅 Semana 12</span>
+    <span>📚 Base de Datos II</span>
+    <span>🛢️ SQL Server</span>
+    <span>👨‍🏫 Mg. Ing. Raúl Fernández Bejarano</span>
+  </div>
+</div>
+
+<div class="nav-wrap">
+  <div class="nav-tabs">
+    <button class="tab-btn t1 active" onclick="showTab('t1',this)">📦 Tema 1 – Estrategias Backup</button>
+    <button class="tab-btn t2" onclick="showTab('t2',this)">🔄 Tema 2 – Restauración</button>
+    <button class="tab-btn t3" onclick="showTab('t3',this)">✅ Tema 3 – Verificación</button>
+    <button class="tab-btn t4" onclick="showTab('t4',this)">💿 Tema 4 – BACKUP/RESTORE</button>
+    <button class="tab-btn t5" onclick="showTab('t5',this)">📋 Tema 5 – Planes Mantenimiento</button>
+    <button class="tab-btn t6" onclick="showTab('t6',this)">⏰ Tema 6 – Punto en el Tiempo</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ════════════════════════════════════════
+     TEMA 1 – ESTRATEGIAS DE BACKUP
+════════════════════════════════════════ -->
+<div id="t1" class="section active">
+  <div class="infog-header h-teal">
+    <div class="icon">📦</div>
+    <div>
+      <h2>Tema 1 · Estrategias de Backup: Completo, Diferencial y Transaccional</h2>
+      <p>Diseño de estrategias de respaldo para garantizar continuidad operativa</p>
     </div>
   </div>
 
-  <div class="nav-wrap">
-    <div class="nav-tabs">
-      <button class="tab-btn t1 active" onclick="showTab('t1',this)">📦 Tema 1 – Estrategias Backup</button>
-      <button class="tab-btn t2" onclick="showTab('t2',this)">🔄 Tema 2 – Restauración</button>
-      <button class="tab-btn t3" onclick="showTab('t3',this)">✅ Tema 3 – Verificación</button>
-      <button class="tab-btn t4" onclick="showTab('t4',this)">💿 Tema 4 – BACKUP/RESTORE</button>
-      <button class="tab-btn t5" onclick="showTab('t5',this)">📋 Tema 5 – Planes Mantenimiento</button>
-      <button class="tab-btn t6" onclick="showTab('t6',this)">⏰ Tema 6 – Punto en el Tiempo</button>
+  <!-- Diagrama visual de tipos de backup -->
+  <div class="backup-diagram">
+    <div class="bk-step">
+      <div class="bk-icon bk-full">📦</div>
+      <div class="bk-label">FULL</div>
+      <div class="bk-sub">Base completa</div>
+    </div>
+    <div class="bk-arrow">→</div>
+    <div class="bk-step">
+      <div class="bk-icon bk-diff">📋</div>
+      <div class="bk-label">DIFERENCIAL</div>
+      <div class="bk-sub">Cambios desde FULL</div>
+    </div>
+    <div class="bk-arrow">→</div>
+    <div class="bk-step">
+      <div class="bk-icon bk-log">📝</div>
+      <div class="bk-label">LOG</div>
+      <div class="bk-sub">Transacciones</div>
+    </div>
+    <div class="bk-arrow">→</div>
+    <div class="bk-step">
+      <div class="bk-icon bk-log">📝</div>
+      <div class="bk-label">LOG</div>
+      <div class="bk-sub">Cada 15-30 min</div>
+    </div>
+    <div class="bk-arrow">→</div>
+    <div class="bk-step">
+      <div class="bk-icon bk-diff">📋</div>
+      <div class="bk-label">DIFERENCIAL</div>
+      <div class="bk-sub">Al día siguiente</div>
     </div>
   </div>
 
-  <div class="main">
-
-  <!-- ════════════════════════════════════════
-      TEMA 1 – ESTRATEGIAS DE BACKUP
-  ════════════════════════════════════════ -->
-  <div id="t1" class="section active">
-    <div class="infog-header h-teal">
-      <div class="icon">📦</div>
-      <div>
-        <h2>Tema 1 · Estrategias de Backup: Completo, Diferencial y Transaccional</h2>
-        <p>Diseño de estrategias de respaldo para garantizar continuidad operativa</p>
-      </div>
+  <div class="infog-grid">
+    <div class="infog-card c-teal">
+      <span class="card-emoji">📦</span>
+      <h3>Backup Completo (Full)</h3>
+      <p>Copia toda la base de datos. Base para cualquier estrategia de restauración. Es el punto de partida obligatorio.</p>
+      <div class="badge-row"><span class="badge b-t">BACKUP DATABASE</span><span class="badge b-t">Semanal/Diario</span></div>
     </div>
-
-    <!-- Diagrama visual de tipos de backup -->
-    <div class="backup-diagram">
-      <div class="bk-step">
-        <div class="bk-icon bk-full">📦</div>
-        <div class="bk-label">FULL</div>
-        <div class="bk-sub">Base completa</div>
-      </div>
-      <div class="bk-arrow">→</div>
-      <div class="bk-step">
-        <div class="bk-icon bk-diff">📋</div>
-        <div class="bk-label">DIFERENCIAL</div>
-        <div class="bk-sub">Cambios desde FULL</div>
-      </div>
-      <div class="bk-arrow">→</div>
-      <div class="bk-step">
-        <div class="bk-icon bk-log">📝</div>
-        <div class="bk-label">LOG</div>
-        <div class="bk-sub">Transacciones</div>
-      </div>
-      <div class="bk-arrow">→</div>
-      <div class="bk-step">
-        <div class="bk-icon bk-log">📝</div>
-        <div class="bk-label">LOG</div>
-        <div class="bk-sub">Cada 15-30 min</div>
-      </div>
-      <div class="bk-arrow">→</div>
-      <div class="bk-step">
-        <div class="bk-icon bk-diff">📋</div>
-        <div class="bk-label">DIFERENCIAL</div>
-        <div class="bk-sub">Al día siguiente</div>
-      </div>
+    <div class="infog-card c-indigo">
+      <span class="card-emoji">📋</span>
+      <h3>Backup Diferencial</h3>
+      <p>Solo los datos modificados desde el último Full. Más rápido y liviano. Se aplica encima del Full al restaurar.</p>
+      <div class="badge-row"><span class="badge b-i">WITH DIFFERENTIAL</span><span class="badge b-i">Diario</span></div>
     </div>
-
-    <div class="infog-grid">
-      <div class="infog-card c-teal">
-        <span class="card-emoji">📦</span>
-        <h3>Backup Completo (Full)</h3>
-        <p>Copia toda la base de datos. Base para cualquier estrategia de restauración. Es el punto de partida obligatorio.</p>
-        <div class="badge-row"><span class="badge b-t">BACKUP DATABASE</span><span class="badge b-t">Semanal/Diario</span></div>
-      </div>
-      <div class="infog-card c-indigo">
-        <span class="card-emoji">📋</span>
-        <h3>Backup Diferencial</h3>
-        <p>Solo los datos modificados desde el último Full. Más rápido y liviano. Se aplica encima del Full al restaurar.</p>
-        <div class="badge-row"><span class="badge b-i">WITH DIFFERENTIAL</span><span class="badge b-i">Diario</span></div>
-      </div>
-      <div class="infog-card c-sage">
-        <span class="card-emoji">📝</span>
-        <h3>Backup de Log (Transaccional)</h3>
-        <p>Respalda el log de transacciones. Permite restauración punto en el tiempo. Requiere modelo FULL.</p>
-        <div class="badge-row"><span class="badge b-s">BACKUP LOG</span><span class="badge b-s">Cada 15-30 min</span></div>
-      </div>
-      <div class="infog-card c-amber">
-        <span class="card-emoji">🧮</span>
-        <h3>RPO y RTO</h3>
-        <p><strong>RPO</strong>: máxima pérdida de datos aceptable. <strong>RTO</strong>: tiempo máximo para recuperar. Los backups de log minimizan el RPO.</p>
-        <div class="badge-row"><span class="badge b-a">RPO</span><span class="badge b-a">RTO</span><span class="badge b-a">SLA</span></div>
-      </div>
+    <div class="infog-card c-sage">
+      <span class="card-emoji">📝</span>
+      <h3>Backup de Log (Transaccional)</h3>
+      <p>Respalda el log de transacciones. Permite restauración punto en el tiempo. Requiere modelo FULL.</p>
+      <div class="badge-row"><span class="badge b-s">BACKUP LOG</span><span class="badge b-s">Cada 15-30 min</span></div>
     </div>
+    <div class="infog-card c-amber">
+      <span class="card-emoji">🧮</span>
+      <h3>RPO y RTO</h3>
+      <p><strong>RPO</strong>: máxima pérdida de datos aceptable. <strong>RTO</strong>: tiempo máximo para recuperar. Los backups de log minimizan el RPO.</p>
+      <div class="badge-row"><span class="badge b-a">RPO</span><span class="badge b-a">RTO</span><span class="badge b-a">SLA</span></div>
+    </div>
+  </div>
 
-    <table class="compare-table">
-      <thead><tr><th>Tipo</th><th>¿Qué respalda?</th><th>Velocidad</th><th>Espacio</th><th>Uso típico</th></tr></thead>
-      <tbody>
-        <tr><td>📦 Full</td><td>Todo</td><td>Lenta</td><td>Grande</td><td>Semanal / Domingo</td></tr>
-        <tr><td>📋 Diferencial</td><td>Cambios desde Full</td><td>Media</td><td>Medio</td><td>Diario</td></tr>
-        <tr><td>📝 Log</td><td>Transacciones</td><td>Muy rápida</td><td>Pequeño</td><td>Cada 15-30 min</td></tr>
-      </tbody>
-    </table>
+  <table class="compare-table">
+    <thead><tr><th>Tipo</th><th>¿Qué respalda?</th><th>Velocidad</th><th>Espacio</th><th>Uso típico</th></tr></thead>
+    <tbody>
+      <tr><td>📦 Full</td><td>Todo</td><td>Lenta</td><td>Grande</td><td>Semanal / Domingo</td></tr>
+      <tr><td>📋 Diferencial</td><td>Cambios desde Full</td><td>Media</td><td>Medio</td><td>Diario</td></tr>
+      <tr><td>📝 Log</td><td>Transacciones</td><td>Muy rápida</td><td>Pequeño</td><td>Cada 15-30 min</td></tr>
+    </tbody>
+  </table>
 
-    <div class="section-divider">📁 Proyectos Prácticos</div>
+  <div class="section-divider">📁 Proyectos Prácticos</div>
 
-    <!-- P1 -->
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#2BA99B">1</div>
-        <h3>Respaldo Completo Institucional de GradosTitulos</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>La Oficina de TI requiere una política de respaldo completo diario para GradosTitulos que almacena información crítica de estudiantes, trámites, evaluaciones, resoluciones y diplomas. Crear un procedimiento que genere el respaldo y registre la fecha de ejecución.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Procedimiento de respaldo completo con fecha dinámica</span>
-  <span class="kw">CREATE OR ALTER PROCEDURE</span> <span class="fn">usp_BackupCompleto_GradosTitulos</span>
-  <span class="kw">AS</span>
-  <span class="kw">BEGIN</span>
-      <span class="kw">DECLARE</span> @ruta    <span class="kw">NVARCHAR</span>(<span class="num">500</span>)
-      <span class="kw">DECLARE</span> @fecha   <span class="kw">NVARCHAR</span>(<span class="num">20</span>)
-      <span class="kw">DECLARE</span> @sql     <span class="kw">NVARCHAR</span>(<span class="num">1000</span>)
+  <!-- P1 -->
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#2BA99B">1</div>
+      <h3>Respaldo Completo Institucional de GradosTitulos</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>La Oficina de TI requiere una política de respaldo completo diario para GradosTitulos que almacena información crítica de estudiantes, trámites, evaluaciones, resoluciones y diplomas. Crear un procedimiento que genere el respaldo y registre la fecha de ejecución.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Procedimiento de respaldo completo con fecha dinámica</span>
+<span class="kw">CREATE OR ALTER PROCEDURE</span> <span class="fn">usp_BackupCompleto_GradosTitulos</span>
+<span class="kw">AS</span>
+<span class="kw">BEGIN</span>
+    <span class="kw">DECLARE</span> @ruta    <span class="kw">NVARCHAR</span>(<span class="num">500</span>)
+    <span class="kw">DECLARE</span> @fecha   <span class="kw">NVARCHAR</span>(<span class="num">20</span>)
+    <span class="kw">DECLARE</span> @sql     <span class="kw">NVARCHAR</span>(<span class="num">1000</span>)
 
-      <span class="cm">-- Nombre de archivo con fecha/hora</span>
-      <span class="kw">SET</span> @fecha = <span class="fn">CONVERT</span>(<span class="kw">NVARCHAR</span>, <span class="fn">GETDATE</span>(), <span class="num">112</span>)
-                + <span class="str">'_'</span>
-                + <span class="fn">REPLACE</span>(<span class="fn">CONVERT</span>(<span class="kw">NVARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">108</span>),<span class="str">':'</span>,<span class="str">''</span>)
+    <span class="cm">-- Nombre de archivo con fecha/hora</span>
+    <span class="kw">SET</span> @fecha = <span class="fn">CONVERT</span>(<span class="kw">NVARCHAR</span>, <span class="fn">GETDATE</span>(), <span class="num">112</span>)
+               + <span class="str">'_'</span>
+               + <span class="fn">REPLACE</span>(<span class="fn">CONVERT</span>(<span class="kw">NVARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">108</span>),<span class="str">':'</span>,<span class="str">''</span>)
 
-      <span class="kw">SET</span> @ruta = <span class="str">'C:\Backups\GradosTitulos\Full\GT_Full_'</span>
-                + @fecha + <span class="str">'.bak'</span>
+    <span class="kw">SET</span> @ruta = <span class="str">'C:\Backups\GradosTitulos\Full\GT_Full_'</span>
+              + @fecha + <span class="str">'.bak'</span>
 
-      <span class="cm">-- Ejecutar backup con compresión</span>
-      <span class="kw">SET</span> @sql = <span class="str">'BACKUP DATABASE GradosTitulos
-          TO DISK = '''</span> + @ruta + <span class="str">'''
-          WITH COMPRESSION, CHECKSUM,
-              NAME = ''GradosTitulos Full ''</span> + @fecha + <span class="str">''',
-              DESCRIPTION = ''Backup completo institucional'''</span>
+    <span class="cm">-- Ejecutar backup con compresión</span>
+    <span class="kw">SET</span> @sql = <span class="str">'BACKUP DATABASE GradosTitulos
+        TO DISK = '''</span> + @ruta + <span class="str">'''
+        WITH COMPRESSION, CHECKSUM,
+             NAME = ''GradosTitulos Full ''</span> + @fecha + <span class="str">''',
+             DESCRIPTION = ''Backup completo institucional'''</span>
 
-      <span class="kw">EXEC</span> <span class="fn">sp_executesql</span> @sql
+    <span class="kw">EXEC</span> <span class="fn">sp_executesql</span> @sql
 
-      <span class="cm">-- Registrar en tabla de control</span>
-      <span class="kw">INSERT INTO</span> <span class="tbl">dbo</span>.HistorialBackup
-          (TipoBackup, FechaEjecucion, RutaArchivo, Estado)
-      <span class="kw">VALUES</span>
-          (<span class="str">'FULL'</span>, <span class="fn">GETDATE</span>(), @ruta, <span class="str">'COMPLETADO'</span>)
+    <span class="cm">-- Registrar en tabla de control</span>
+    <span class="kw">INSERT INTO</span> <span class="tbl">dbo</span>.HistorialBackup
+        (TipoBackup, FechaEjecucion, RutaArchivo, Estado)
+    <span class="kw">VALUES</span>
+        (<span class="str">'FULL'</span>, <span class="fn">GETDATE</span>(), @ruta, <span class="str">'COMPLETADO'</span>)
 
-      <span class="fn">PRINT</span> <span class="str">'Backup completo generado: '</span> + @ruta
-  <span class="kw">END</span></pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>WITH COMPRESSION reduce hasta 60-70% el tamaño del archivo .bak.</li>
-              <li>WITH CHECKSUM valida la integridad durante la escritura del backup.</li>
-              <li>La tabla HistorialBackup permite auditoría y monitoreo automatizado.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Programar como SQL Agent Job, ejecutado a las 2:00 AM domingo.</li>
-              <li>Copiar el archivo .bak a ubicación externa (NAS o nube) inmediatamente.</li>
-              <li>Verificar el backup con RESTORE VERIFYONLY tras cada ejecución.</li>
-            </ul>
-          </div>
+    <span class="fn">PRINT</span> <span class="str">'Backup completo generado: '</span> + @ruta
+<span class="kw">END</span></pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>WITH COMPRESSION reduce hasta 60-70% el tamaño del archivo .bak.</li>
+            <li>WITH CHECKSUM valida la integridad durante la escritura del backup.</li>
+            <li>La tabla HistorialBackup permite auditoría y monitoreo automatizado.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Programar como SQL Agent Job, ejecutado a las 2:00 AM domingo.</li>
+            <li>Copiar el archivo .bak a ubicación externa (NAS o nube) inmediatamente.</li>
+            <li>Verificar el backup con RESTORE VERIFYONLY tras cada ejecución.</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- P2 -->
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#2BA99B">2</div>
-        <h3>Backups Diferenciales para Trámites Académicos</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>La universidad necesita reducir tiempos de respaldo combinando respaldos completos semanales y diferenciales diarios para los esquemas Tramite y Documento.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Backup diferencial diario</span>
-  <span class="kw">DECLARE</span> @ruta <span class="kw">NVARCHAR</span>(<span class="num">500</span>)
-  <span class="kw">SET</span> @ruta = <span class="str">'C:\Backups\GradosTitulos\Diff\GT_Diff_'</span>
-            + <span class="fn">CONVERT</span>(<span class="kw">NVARCHAR</span>, <span class="fn">GETDATE</span>(), <span class="num">112</span>) + <span class="str">'.bak'</span>
+  <!-- P2 -->
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#2BA99B">2</div>
+      <h3>Backups Diferenciales para Trámites Académicos</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>La universidad necesita reducir tiempos de respaldo combinando respaldos completos semanales y diferenciales diarios para los esquemas Tramite y Documento.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Backup diferencial diario</span>
+<span class="kw">DECLARE</span> @ruta <span class="kw">NVARCHAR</span>(<span class="num">500</span>)
+<span class="kw">SET</span> @ruta = <span class="str">'C:\Backups\GradosTitulos\Diff\GT_Diff_'</span>
+           + <span class="fn">CONVERT</span>(<span class="kw">NVARCHAR</span>, <span class="fn">GETDATE</span>(), <span class="num">112</span>) + <span class="str">'.bak'</span>
 
-  <span class="kw">BACKUP DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">TO DISK</span> = @ruta
-      <span class="kw">WITH DIFFERENTIAL</span>,
-          COMPRESSION,
-          CHECKSUM,
-          NAME = <span class="str">'GT Diferencial '</span>
-                + <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">103</span>),
-          DESCRIPTION = <span class="str">'Backup diferencial GradosTitulos'</span>;
+<span class="kw">BACKUP DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">TO DISK</span> = @ruta
+    <span class="kw">WITH DIFFERENTIAL</span>,
+         COMPRESSION,
+         CHECKSUM,
+         NAME = <span class="str">'GT Diferencial '</span>
+              + <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">103</span>),
+         DESCRIPTION = <span class="str">'Backup diferencial GradosTitulos'</span>;
 
-  <span class="cm">-- Verificar el diferencial generado</span>
-  <span class="kw">RESTORE</span> VERIFYONLY
-      <span class="kw">FROM DISK</span> = @ruta
-      <span class="kw">WITH CHECKSUM</span>;
+<span class="cm">-- Verificar el diferencial generado</span>
+<span class="kw">RESTORE</span> VERIFYONLY
+    <span class="kw">FROM DISK</span> = @ruta
+    <span class="kw">WITH CHECKSUM</span>;
 
-  <span class="cm">-- Cuánto cambió respecto al Full</span>
-  <span class="kw">SELECT</span> backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> size_mb,
-        backup_finish_date, type
-  <span class="kw">FROM</span>   msdb.dbo.backupset
-  <span class="kw">WHERE</span>  database_name = <span class="str">'GradosTitulos'</span>
-  <span class="kw">ORDER BY</span> backup_finish_date <span class="kw">DESC</span>;
-  </pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>El diferencial es acumulativo desde el último FULL, no desde el diferencial anterior.</li>
-              <li>RESTORE VERIFYONLY lee el backup sin restaurarlo, validando su integridad.</li>
-              <li>msdb.dbo.backupset es el catálogo histórico de todos los backups realizados.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Ejecutar diferencial L-S entre las 11:00 PM y 12:00 AM.</li>
-              <li>Mantener mínimo el último FULL + todos los diferenciales hasta ese Full.</li>
-            </ul>
-          </div>
+<span class="cm">-- Cuánto cambió respecto al Full</span>
+<span class="kw">SELECT</span> backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> size_mb,
+       backup_finish_date, type
+<span class="kw">FROM</span>   msdb.dbo.backupset
+<span class="kw">WHERE</span>  database_name = <span class="str">'GradosTitulos'</span>
+<span class="kw">ORDER BY</span> backup_finish_date <span class="kw">DESC</span>;
+</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>El diferencial es acumulativo desde el último FULL, no desde el diferencial anterior.</li>
+            <li>RESTORE VERIFYONLY lee el backup sin restaurarlo, validando su integridad.</li>
+            <li>msdb.dbo.backupset es el catálogo histórico de todos los backups realizados.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Ejecutar diferencial L-S entre las 11:00 PM y 12:00 AM.</li>
+            <li>Mantener mínimo el último FULL + todos los diferenciales hasta ese Full.</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- P3 -->
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#2BA99B">3</div>
-        <h3>Estrategia Integral Full + Differential + Log Backup</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>GradosTitulos opera 24/7. Diseñar estrategia con respaldo semanal, diferencial diario y log cada 30 minutos.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Verificar modelo de recuperación (debe ser FULL para logs)</span>
-  <span class="kw">SELECT</span> name, recovery_model_desc
-  <span class="kw">FROM</span>   sys.databases
-  <span class="kw">WHERE</span>  name = <span class="str">'GradosTitulos'</span>;
+  <!-- P3 -->
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#2BA99B">3</div>
+      <h3>Estrategia Integral Full + Differential + Log Backup</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>GradosTitulos opera 24/7. Diseñar estrategia con respaldo semanal, diferencial diario y log cada 30 minutos.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Verificar modelo de recuperación (debe ser FULL para logs)</span>
+<span class="kw">SELECT</span> name, recovery_model_desc
+<span class="kw">FROM</span>   sys.databases
+<span class="kw">WHERE</span>  name = <span class="str">'GradosTitulos'</span>;
 
-  <span class="cm">-- Asegurar modelo FULL</span>
-  <span class="kw">ALTER DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">SET RECOVERY FULL</span>;
+<span class="cm">-- Asegurar modelo FULL</span>
+<span class="kw">ALTER DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">SET RECOVERY FULL</span>;
 
-  <span class="cm">-- 1. FULL semanal (domingo 2:00 AM)</span>
-  <span class="kw">BACKUP DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Semanal.bak'</span>
-      <span class="kw">WITH</span> COMPRESSION, CHECKSUM, INIT;
+<span class="cm">-- 1. FULL semanal (domingo 2:00 AM)</span>
+<span class="kw">BACKUP DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Semanal.bak'</span>
+    <span class="kw">WITH</span> COMPRESSION, CHECKSUM, INIT;
 
-  <span class="cm">-- 2. DIFERENCIAL diario (lunes a sábado 11 PM)</span>
-  <span class="kw">BACKUP DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Diff\GT_Diff_Diario.bak'</span>
-      <span class="kw">WITH DIFFERENTIAL</span>, COMPRESSION, CHECKSUM, INIT;
+<span class="cm">-- 2. DIFERENCIAL diario (lunes a sábado 11 PM)</span>
+<span class="kw">BACKUP DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Diff\GT_Diff_Diario.bak'</span>
+    <span class="kw">WITH DIFFERENTIAL</span>, COMPRESSION, CHECKSUM, INIT;
 
-  <span class="cm">-- 3. LOG cada 30 minutos (mediante Agent Job)</span>
-  <span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_'</span>
-              + <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">112</span>)
-              + <span class="fn">REPLACE</span>(<span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">108</span>),<span class="str">':'</span>,<span class="str">''</span>)
-              + <span class="str">'.trn'</span>
-      <span class="kw">WITH</span> COMPRESSION, CHECKSUM;</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>Modelo FULL obligatorio para poder hacer backup de logs transaccionales.</li>
-              <li>WITH INIT sobrescribe el archivo (útil para jobs nocturnos únicos).</li>
-              <li>Archivos .trn para logs permiten restauración a cualquier minuto.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Crear 3 jobs en SQL Agent: uno por cada tipo de backup.</li>
-              <li>Alertar por correo si algún job falla.</li>
-              <li>Almacenar logs en subcarpeta con la fecha del día (ej: C:\Backups\Log\2024-11\).</li>
-            </ul>
-          </div>
+<span class="cm">-- 3. LOG cada 30 minutos (mediante Agent Job)</span>
+<span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_'</span>
+             + <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">112</span>)
+             + <span class="fn">REPLACE</span>(<span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">108</span>),<span class="str">':'</span>,<span class="str">''</span>)
+             + <span class="str">'.trn'</span>
+    <span class="kw">WITH</span> COMPRESSION, CHECKSUM;</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>Modelo FULL obligatorio para poder hacer backup de logs transaccionales.</li>
+            <li>WITH INIT sobrescribe el archivo (útil para jobs nocturnos únicos).</li>
+            <li>Archivos .trn para logs permiten restauración a cualquier minuto.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Crear 3 jobs en SQL Agent: uno por cada tipo de backup.</li>
+            <li>Alertar por correo si algún job falla.</li>
+            <li>Almacenar logs en subcarpeta con la fecha del día (ej: C:\Backups\Log\2024-11\).</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- P4 -->
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#2BA99B">4</div>
-        <h3>Estrategia de Respaldo para Alta Disponibilidad</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Diseñar una estrategia de recuperación ante desastres para la plataforma institucional de grados y títulos, garantizando recuperación máxima de 15 minutos.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Estrategia: FULL dominical + DIFF diario + LOG cada 15 min</span>
+  <!-- P4 -->
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#2BA99B">4</div>
+      <h3>Estrategia de Respaldo para Alta Disponibilidad</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Diseñar una estrategia de recuperación ante desastres para la plataforma institucional de grados y títulos, garantizando recuperación máxima de 15 minutos.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Estrategia: FULL dominical + DIFF diario + LOG cada 15 min</span>
 
-  <span class="cm">-- Verificar cadena de backups existente</span>
-  <span class="kw">SELECT</span>
-      <span class="fn">CASE</span> type
-          <span class="kw">WHEN</span> <span class="str">'D'</span> <span class="kw">THEN</span> <span class="str">'Full'</span>
-          <span class="kw">WHEN</span> <span class="str">'I'</span> <span class="kw">THEN</span> <span class="str">'Diferencial'</span>
-          <span class="kw">WHEN</span> <span class="str">'L'</span> <span class="kw">THEN</span> <span class="str">'Log'</span>
-      <span class="kw">END</span> <span class="kw">AS</span> TipoBackup,
-      backup_start_date,
-      backup_finish_date,
-      backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> size_mb,
-      compressed_backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> compressed_mb
-  <span class="kw">FROM</span>   msdb.dbo.backupset
-  <span class="kw">WHERE</span>  database_name = <span class="str">'GradosTitulos'</span>
-    <span class="kw">AND</span>  backup_start_date >= <span class="fn">DATEADD</span>(<span class="kw">DAY</span>, -<span class="num">7</span>, <span class="fn">GETDATE</span>())
-  <span class="kw">ORDER BY</span> backup_start_date <span class="kw">DESC</span>;
+<span class="cm">-- Verificar cadena de backups existente</span>
+<span class="kw">SELECT</span>
+    <span class="fn">CASE</span> type
+        <span class="kw">WHEN</span> <span class="str">'D'</span> <span class="kw">THEN</span> <span class="str">'Full'</span>
+        <span class="kw">WHEN</span> <span class="str">'I'</span> <span class="kw">THEN</span> <span class="str">'Diferencial'</span>
+        <span class="kw">WHEN</span> <span class="str">'L'</span> <span class="kw">THEN</span> <span class="str">'Log'</span>
+    <span class="kw">END</span> <span class="kw">AS</span> TipoBackup,
+    backup_start_date,
+    backup_finish_date,
+    backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> size_mb,
+    compressed_backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> compressed_mb
+<span class="kw">FROM</span>   msdb.dbo.backupset
+<span class="kw">WHERE</span>  database_name = <span class="str">'GradosTitulos'</span>
+  <span class="kw">AND</span>  backup_start_date >= <span class="fn">DATEADD</span>(<span class="kw">DAY</span>, -<span class="num">7</span>, <span class="fn">GETDATE</span>())
+<span class="kw">ORDER BY</span> backup_start_date <span class="kw">DESC</span>;
 
-  <span class="cm">-- Log con RPO de 15 minutos</span>
-  <span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_15min.trn'</span>
-      <span class="kw">WITH</span> COMPRESSION, CHECKSUM, NOINIT;</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>msdb.dbo.backupset es la fuente oficial del historial de backups de SQL Server.</li>
-              <li>Monitorear compressed_mb vs backup_size valida la efectividad de la compresión.</li>
-              <li>NOINIT permite adjuntar múltiples logs al mismo archivo (.trn).</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Definir SLA documentado: RPO = 15 min, RTO = 30 min.</li>
-              <li>Realizar simulacros de recuperación trimestralmente.</li>
-              <li>Probar la cadena completa Full→Diff→Log en ambiente de pruebas.</li>
-            </ul>
-          </div>
+<span class="cm">-- Log con RPO de 15 minutos</span>
+<span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_15min.trn'</span>
+    <span class="kw">WITH</span> COMPRESSION, CHECKSUM, NOINIT;</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>msdb.dbo.backupset es la fuente oficial del historial de backups de SQL Server.</li>
+            <li>Monitorear compressed_mb vs backup_size valida la efectividad de la compresión.</li>
+            <li>NOINIT permite adjuntar múltiples logs al mismo archivo (.trn).</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Definir SLA documentado: RPO = 15 min, RTO = 30 min.</li>
+            <li>Realizar simulacros de recuperación trimestralmente.</li>
+            <li>Probar la cadena completa Full→Diff→Log en ambiente de pruebas.</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- P5 -->
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#2BA99B">5</div>
-        <h3>Estrategia Corporativa de Respaldo (pérdida máx. 15 min)</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Diseñar solución que incluya: respaldo completo dominical, diferencial diario, log cada 15 min, compresión y verificación automática de integridad.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Procedimiento maestro de respaldo corporativo</span>
-  <span class="kw">CREATE OR ALTER PROCEDURE</span> <span class="fn">usp_BackupCorporativo</span>
-      @TipoBackup <span class="kw">CHAR</span>(<span class="num">4</span>)  <span class="cm">-- 'FULL','DIFF','LOG'</span>
-  <span class="kw">AS</span>
-  <span class="kw">BEGIN</span>
-      <span class="kw">DECLARE</span> @ruta <span class="kw">NVARCHAR</span>(<span class="num">500</span>)
-      <span class="kw">DECLARE</span> @ts   <span class="kw">NVARCHAR</span>(<span class="num">20</span>) =
-          <span class="fn">CONVERT</span>(<span class="kw">NVARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">112</span>) + <span class="str">'_'</span> +
-          <span class="fn">REPLACE</span>(<span class="fn">CONVERT</span>(<span class="kw">NVARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">108</span>),<span class="str">':'</span>,<span class="str">''</span>)
+  <!-- P5 -->
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#2BA99B">5</div>
+      <h3>Estrategia Corporativa de Respaldo (pérdida máx. 15 min)</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Diseñar solución que incluya: respaldo completo dominical, diferencial diario, log cada 15 min, compresión y verificación automática de integridad.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Procedimiento maestro de respaldo corporativo</span>
+<span class="kw">CREATE OR ALTER PROCEDURE</span> <span class="fn">usp_BackupCorporativo</span>
+    @TipoBackup <span class="kw">CHAR</span>(<span class="num">4</span>)  <span class="cm">-- 'FULL','DIFF','LOG'</span>
+<span class="kw">AS</span>
+<span class="kw">BEGIN</span>
+    <span class="kw">DECLARE</span> @ruta <span class="kw">NVARCHAR</span>(<span class="num">500</span>)
+    <span class="kw">DECLARE</span> @ts   <span class="kw">NVARCHAR</span>(<span class="num">20</span>) =
+        <span class="fn">CONVERT</span>(<span class="kw">NVARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">112</span>) + <span class="str">'_'</span> +
+        <span class="fn">REPLACE</span>(<span class="fn">CONVERT</span>(<span class="kw">NVARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">108</span>),<span class="str">':'</span>,<span class="str">''</span>)
 
-      <span class="kw">IF</span> @TipoBackup = <span class="str">'FULL'</span>
-          <span class="kw">SET</span> @ruta = <span class="str">'C:\Backups\Full\GT_Full_'</span>+@ts+<span class="str">'.bak'</span>
-      <span class="kw">ELSE IF</span> @TipoBackup = <span class="str">'DIFF'</span>
-          <span class="kw">SET</span> @ruta = <span class="str">'C:\Backups\Diff\GT_Diff_'</span>+@ts+<span class="str">'.bak'</span>
-      <span class="kw">ELSE</span>
-          <span class="kw">SET</span> @ruta = <span class="str">'C:\Backups\Log\GT_Log_'</span>+@ts+<span class="str">'.trn'</span>
+    <span class="kw">IF</span> @TipoBackup = <span class="str">'FULL'</span>
+        <span class="kw">SET</span> @ruta = <span class="str">'C:\Backups\Full\GT_Full_'</span>+@ts+<span class="str">'.bak'</span>
+    <span class="kw">ELSE IF</span> @TipoBackup = <span class="str">'DIFF'</span>
+        <span class="kw">SET</span> @ruta = <span class="str">'C:\Backups\Diff\GT_Diff_'</span>+@ts+<span class="str">'.bak'</span>
+    <span class="kw">ELSE</span>
+        <span class="kw">SET</span> @ruta = <span class="str">'C:\Backups\Log\GT_Log_'</span>+@ts+<span class="str">'.trn'</span>
 
-      <span class="cm">-- Ejecutar backup según tipo</span>
-      <span class="kw">IF</span> @TipoBackup <span class="kw">IN</span> (<span class="str">'FULL'</span>,<span class="str">'DIFF'</span>)
-          <span class="kw">EXEC</span>(<span class="str">'BACKUP DATABASE GradosTitulos TO DISK='''</span>+@ruta+<span class="str">''' WITH COMPRESSION,CHECKSUM'</span>
-            + <span class="kw">CASE</span> <span class="kw">WHEN</span> @TipoBackup=<span class="str">'DIFF'</span> <span class="kw">THEN</span> <span class="str">',DIFFERENTIAL'</span> <span class="kw">ELSE</span> <span class="str">''</span> <span class="kw">END</span>)
-      <span class="kw">ELSE</span>
-          <span class="kw">EXEC</span>(<span class="str">'BACKUP LOG GradosTitulos TO DISK='''</span>+@ruta+<span class="str">''' WITH COMPRESSION,CHECKSUM'</span>)
+    <span class="cm">-- Ejecutar backup según tipo</span>
+    <span class="kw">IF</span> @TipoBackup <span class="kw">IN</span> (<span class="str">'FULL'</span>,<span class="str">'DIFF'</span>)
+        <span class="kw">EXEC</span>(<span class="str">'BACKUP DATABASE GradosTitulos TO DISK='''</span>+@ruta+<span class="str">''' WITH COMPRESSION,CHECKSUM'</span>
+           + <span class="kw">CASE</span> <span class="kw">WHEN</span> @TipoBackup=<span class="str">'DIFF'</span> <span class="kw">THEN</span> <span class="str">',DIFFERENTIAL'</span> <span class="kw">ELSE</span> <span class="str">''</span> <span class="kw">END</span>)
+    <span class="kw">ELSE</span>
+        <span class="kw">EXEC</span>(<span class="str">'BACKUP LOG GradosTitulos TO DISK='''</span>+@ruta+<span class="str">''' WITH COMPRESSION,CHECKSUM'</span>)
 
-      <span class="cm">-- Verificar integridad automáticamente</span>
-      <span class="kw">RESTORE</span> VERIFYONLY <span class="kw">FROM DISK</span>=@ruta <span class="kw">WITH CHECKSUM</span>
+    <span class="cm">-- Verificar integridad automáticamente</span>
+    <span class="kw">RESTORE</span> VERIFYONLY <span class="kw">FROM DISK</span>=@ruta <span class="kw">WITH CHECKSUM</span>
 
-      <span class="cm">-- Log de control</span>
-      <span class="kw">INSERT INTO</span> <span class="tbl">dbo</span>.HistorialBackup(TipoBackup,FechaEjecucion,RutaArchivo,Estado)
-      <span class="kw">VALUES</span>(@TipoBackup,<span class="fn">GETDATE</span>(),@ruta,<span class="str">'OK'</span>)
-  <span class="kw">END</span></pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>Procedimiento único para los 3 tipos de backup reduce el riesgo de error humano.</li>
-              <li>RESTORE VERIFYONLY integrado garantiza que cada backup es restaurable.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Llamar al procedimiento desde 3 SQL Agent Jobs diferentes con sus frecuencias.</li>
-              <li>Enviar alerta por correo si el INSERT en HistorialBackup no ocurre en el tiempo esperado.</li>
-            </ul>
-          </div>
+    <span class="cm">-- Log de control</span>
+    <span class="kw">INSERT INTO</span> <span class="tbl">dbo</span>.HistorialBackup(TipoBackup,FechaEjecucion,RutaArchivo,Estado)
+    <span class="kw">VALUES</span>(@TipoBackup,<span class="fn">GETDATE</span>(),@ruta,<span class="str">'OK'</span>)
+<span class="kw">END</span></pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>Procedimiento único para los 3 tipos de backup reduce el riesgo de error humano.</li>
+            <li>RESTORE VERIFYONLY integrado garantiza que cada backup es restaurable.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Llamar al procedimiento desde 3 SQL Agent Jobs diferentes con sus frecuencias.</li>
+            <li>Enviar alerta por correo si el INSERT en HistorialBackup no ocurre en el tiempo esperado.</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- P6 -->
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#2BA99B">6</div>
-        <h3>Estrategia de Respaldo para Disaster Recovery</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>La Oficina de TI requiere un Disaster Recovery para GradosTitulos: reconstruir la BD completamente en un servidor alterno ante la pérdida total del servidor principal.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Copiar backups a servidor alterno (xp_cmdshell o robocopy en job)</span>
-  <span class="cm">-- En servidor ALTERNO: restaurar la cadena completa</span>
+  <!-- P6 -->
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#2BA99B">6</div>
+      <h3>Estrategia de Respaldo para Disaster Recovery</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>La Oficina de TI requiere un Disaster Recovery para GradosTitulos: reconstruir la BD completamente en un servidor alterno ante la pérdida total del servidor principal.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Copiar backups a servidor alterno (xp_cmdshell o robocopy en job)</span>
+<span class="cm">-- En servidor ALTERNO: restaurar la cadena completa</span>
 
-  <span class="cm">-- Paso 1: Restaurar FULL sin recuperar</span>
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'\\NAS\Backups\Full\GT_Full_Semanal.bak'</span>
-      <span class="kw">WITH</span> NORECOVERY,
-      MOVE <span class="str">'GradosTitulos'</span>     <span class="kw">TO</span> <span class="str">'D:\Data\GT.mdf'</span>,
-      MOVE <span class="str">'GradosTitulos_log'</span> <span class="kw">TO</span> <span class="str">'E:\Log\GT_log.ldf'</span>,
-      REPLACE;
+<span class="cm">-- Paso 1: Restaurar FULL sin recuperar</span>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'\\NAS\Backups\Full\GT_Full_Semanal.bak'</span>
+    <span class="kw">WITH</span> NORECOVERY,
+    MOVE <span class="str">'GradosTitulos'</span>     <span class="kw">TO</span> <span class="str">'D:\Data\GT.mdf'</span>,
+    MOVE <span class="str">'GradosTitulos_log'</span> <span class="kw">TO</span> <span class="str">'E:\Log\GT_log.ldf'</span>,
+    REPLACE;
 
-  <span class="cm">-- Paso 2: Aplicar DIFERENCIAL más reciente</span>
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'\\NAS\Backups\Diff\GT_Diff_Ayer.bak'</span>
-      <span class="kw">WITH</span> NORECOVERY;
+<span class="cm">-- Paso 2: Aplicar DIFERENCIAL más reciente</span>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'\\NAS\Backups\Diff\GT_Diff_Ayer.bak'</span>
+    <span class="kw">WITH</span> NORECOVERY;
 
-  <span class="cm">-- Paso 3: Aplicar todos los LOGS en orden</span>
-  <span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'\\NAS\Backups\Log\GT_Log_0000.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY;
+<span class="cm">-- Paso 3: Aplicar todos los LOGS en orden</span>
+<span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'\\NAS\Backups\Log\GT_Log_0000.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY;
 
-  <span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'\\NAS\Backups\Log\GT_Log_0030.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY;
+<span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'\\NAS\Backups\Log\GT_Log_0030.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY;
 
-  <span class="cm">-- Paso 4: Poner la BD en línea</span>
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">WITH</span> RECOVERY;
+<span class="cm">-- Paso 4: Poner la BD en línea</span>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">WITH</span> RECOVERY;
 
-  <span class="cm">-- Verificar estado</span>
-  <span class="kw">SELECT</span> name, state_desc, recovery_model_desc
-  <span class="kw">FROM</span>   sys.databases
-  <span class="kw">WHERE</span>  name = <span class="str">'GradosTitulos'</span>;</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>NORECOVERY mantiene la BD en modo restoring para aplicar más backups.</li>
-              <li>MOVE redirige los archivos físicos a las rutas del servidor alterno.</li>
-              <li>REPLACE permite sobrescribir si la BD ya existía en el servidor destino.</li>
-              <li>El último RESTORE con RECOVERY pone la BD en línea.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Documentar el runbook de DR con cada paso y tiempo estimado.</li>
-              <li>Realizar drill de DR semestralmente en el servidor alterno.</li>
-              <li>Mantener los backups en una ubicación accesible desde el servidor alterno (NAS o nube).</li>
-            </ul>
-          </div>
+<span class="cm">-- Verificar estado</span>
+<span class="kw">SELECT</span> name, state_desc, recovery_model_desc
+<span class="kw">FROM</span>   sys.databases
+<span class="kw">WHERE</span>  name = <span class="str">'GradosTitulos'</span>;</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>NORECOVERY mantiene la BD en modo restoring para aplicar más backups.</li>
+            <li>MOVE redirige los archivos físicos a las rutas del servidor alterno.</li>
+            <li>REPLACE permite sobrescribir si la BD ya existía en el servidor destino.</li>
+            <li>El último RESTORE con RECOVERY pone la BD en línea.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Documentar el runbook de DR con cada paso y tiempo estimado.</li>
+            <li>Realizar drill de DR semestralmente en el servidor alterno.</li>
+            <li>Mantener los backups en una ubicación accesible desde el servidor alterno (NAS o nube).</li>
+          </ul>
         </div>
       </div>
     </div>
-  </div><!-- /t1 -->
+  </div>
+</div><!-- /t1 -->
 
 
-  <!-- ════════════════════════════════════════
-      TEMA 2 – RESTAURACIÓN
-  ════════════════════════════════════════ -->
-  <div id="t2" class="section">
-    <div class="infog-header h-indigo">
-      <div class="icon">🔄</div>
-      <div>
-        <h2>Tema 2 · Restauración de Bases de Datos en Distintos Escenarios</h2>
-        <p>Recuperación ante eliminaciones accidentales, corrupción y desastres totales</p>
-      </div>
+<!-- ════════════════════════════════════════
+     TEMA 2 – RESTAURACIÓN
+════════════════════════════════════════ -->
+<div id="t2" class="section">
+  <div class="infog-header h-indigo">
+    <div class="icon">🔄</div>
+    <div>
+      <h2>Tema 2 · Restauración de Bases de Datos en Distintos Escenarios</h2>
+      <p>Recuperación ante eliminaciones accidentales, corrupción y desastres totales</p>
     </div>
+  </div>
 
-    <div class="infog-grid">
-      <div class="infog-card c-indigo">
-        <span class="card-emoji">🧩</span>
-        <h3>Escenarios de Restauración</h3>
-        <p>Eliminación accidental, servidor alterno, corrupción de MDF, desastre total, contingencia.</p>
-        <div class="badge-row"><span class="badge b-i">NORECOVERY</span><span class="badge b-i">RECOVERY</span></div>
-      </div>
-      <div class="infog-card c-indigo">
-        <span class="card-emoji">⛓️</span>
-        <h3>Cadena de Restauración</h3>
-        <p>Full → Diferencial → Logs (en orden). No se puede saltar ningún eslabón.</p>
-        <div class="badge-row"><span class="badge b-i">Secuencial</span><span class="badge b-i">LSN</span></div>
-      </div>
-      <div class="infog-card c-indigo">
-        <span class="card-emoji">🏥</span>
-        <h3>Modo EMERGENCY</h3>
-        <p>Permite acceso de lectura a una BD dañada para extraer datos antes de restaurar.</p>
-        <div class="badge-row"><span class="badge b-i">DBCC CHECKDB</span><span class="badge b-i">REPAIR</span></div>
-      </div>
-      <div class="infog-card c-indigo">
-        <span class="card-emoji">🖥️</span>
-        <h3>Servidor Alterno</h3>
-        <p>Restaurar con MOVE para adaptar rutas de archivos al nuevo servidor de destino.</p>
-        <div class="badge-row"><span class="badge b-i">MOVE</span><span class="badge b-i">REPLACE</span></div>
-      </div>
+  <div class="infog-grid">
+    <div class="infog-card c-indigo">
+      <span class="card-emoji">🧩</span>
+      <h3>Escenarios de Restauración</h3>
+      <p>Eliminación accidental, servidor alterno, corrupción de MDF, desastre total, contingencia.</p>
+      <div class="badge-row"><span class="badge b-i">NORECOVERY</span><span class="badge b-i">RECOVERY</span></div>
     </div>
+    <div class="infog-card c-indigo">
+      <span class="card-emoji">⛓️</span>
+      <h3>Cadena de Restauración</h3>
+      <p>Full → Diferencial → Logs (en orden). No se puede saltar ningún eslabón.</p>
+      <div class="badge-row"><span class="badge b-i">Secuencial</span><span class="badge b-i">LSN</span></div>
+    </div>
+    <div class="infog-card c-indigo">
+      <span class="card-emoji">🏥</span>
+      <h3>Modo EMERGENCY</h3>
+      <p>Permite acceso de lectura a una BD dañada para extraer datos antes de restaurar.</p>
+      <div class="badge-row"><span class="badge b-i">DBCC CHECKDB</span><span class="badge b-i">REPAIR</span></div>
+    </div>
+    <div class="infog-card c-indigo">
+      <span class="card-emoji">🖥️</span>
+      <h3>Servidor Alterno</h3>
+      <p>Restaurar con MOVE para adaptar rutas de archivos al nuevo servidor de destino.</p>
+      <div class="badge-row"><span class="badge b-i">MOVE</span><span class="badge b-i">REPLACE</span></div>
+    </div>
+  </div>
 
-    <div class="section-divider">📁 Proyectos Prácticos</div>
+  <div class="section-divider">📁 Proyectos Prácticos</div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#5B7CFA">1</div>
-        <h3>Restaurar después de eliminación accidental de registros</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Un administrador eliminó accidentalmente registros relacionados con expedientes de titulación. Restaurar la base usando el respaldo más reciente.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Primero: tail-log backup para capturar transacciones no respaldadas</span>
-  <span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\GT_TailLog_Emergencia.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY, NO_TRUNCATE, CHECKSUM;
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#5B7CFA">1</div>
+      <h3>Restaurar después de eliminación accidental de registros</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Un administrador eliminó accidentalmente registros relacionados con expedientes de titulación. Restaurar la base usando el respaldo más reciente.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Primero: tail-log backup para capturar transacciones no respaldadas</span>
+<span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\GT_TailLog_Emergencia.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY, NO_TRUNCATE, CHECKSUM;
 
-  <span class="cm">-- Restaurar FULL</span>
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Ultimo.bak'</span>
-      <span class="kw">WITH</span> NORECOVERY, REPLACE;
+<span class="cm">-- Restaurar FULL</span>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Ultimo.bak'</span>
+    <span class="kw">WITH</span> NORECOVERY, REPLACE;
 
-  <span class="cm">-- Restaurar DIFERENCIAL</span>
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Diff\GT_Diff_Ayer.bak'</span>
-      <span class="kw">WITH</span> NORECOVERY;
+<span class="cm">-- Restaurar DIFERENCIAL</span>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Diff\GT_Diff_Ayer.bak'</span>
+    <span class="kw">WITH</span> NORECOVERY;
 
-  <span class="cm">-- Restaurar LOGS hasta el momento del incidente</span>
-  <span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_0000.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY;
+<span class="cm">-- Restaurar LOGS hasta el momento del incidente</span>
+<span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_0000.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY;
 
-  <span class="cm">-- Restaurar tail-log (captura final)</span>
-  <span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_TailLog_Emergencia.trn'</span>
-      <span class="kw">WITH</span> RECOVERY;  <span class="cm">-- ← pone online la BD</span></pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>El tail-log backup captura transacciones del log activo antes de restaurar.</li>
-              <li>NO_TRUNCATE preserva el log aunque la BD esté dañada.</li>
-              <li>Sin el tail-log se pierden las transacciones desde el último log backup.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>SIEMPRE hacer tail-log backup antes de restaurar (si la BD está online).</li>
-              <li>Practicar este procedimiento en ambiente de pruebas con datos reales copiados.</li>
-            </ul>
-          </div>
+<span class="cm">-- Restaurar tail-log (captura final)</span>
+<span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_TailLog_Emergencia.trn'</span>
+    <span class="kw">WITH</span> RECOVERY;  <span class="cm">-- ← pone online la BD</span></pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>El tail-log backup captura transacciones del log activo antes de restaurar.</li>
+            <li>NO_TRUNCATE preserva el log aunque la BD esté dañada.</li>
+            <li>Sin el tail-log se pierden las transacciones desde el último log backup.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>SIEMPRE hacer tail-log backup antes de restaurar (si la BD está online).</li>
+            <li>Practicar este procedimiento en ambiente de pruebas con datos reales copiados.</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#5B7CFA">3</div>
-        <h3>Recuperación después de Corrupción del Archivo MDF</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>El archivo principal de datos presenta corrupción física. Implementar el procedimiento de restauración completo utilizando respaldos disponibles.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Diagnosticar corrupción</span>
-  <span class="kw">DBCC CHECKDB</span>(<span class="tbl">GradosTitulos</span>) <span class="kw">WITH</span> NO_INFOMSGS, ALL_ERRORMSGS;
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#5B7CFA">3</div>
+      <h3>Recuperación después de Corrupción del Archivo MDF</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>El archivo principal de datos presenta corrupción física. Implementar el procedimiento de restauración completo utilizando respaldos disponibles.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Diagnosticar corrupción</span>
+<span class="kw">DBCC CHECKDB</span>(<span class="tbl">GradosTitulos</span>) <span class="kw">WITH</span> NO_INFOMSGS, ALL_ERRORMSGS;
 
-  <span class="cm">-- Poner en modo EMERGENCY para leer datos</span>
-  <span class="kw">ALTER DATABASE</span> <span class="tbl">GradosTitulos</span> <span class="kw">SET EMERGENCY</span>;
-  <span class="kw">ALTER DATABASE</span> <span class="tbl">GradosTitulos</span> <span class="kw">SET SINGLE_USER</span>;
+<span class="cm">-- Poner en modo EMERGENCY para leer datos</span>
+<span class="kw">ALTER DATABASE</span> <span class="tbl">GradosTitulos</span> <span class="kw">SET EMERGENCY</span>;
+<span class="kw">ALTER DATABASE</span> <span class="tbl">GradosTitulos</span> <span class="kw">SET SINGLE_USER</span>;
 
-  <span class="cm">-- Intentar reparación (ÚLTIMO RECURSO - puede haber pérdida)</span>
-  <span class="kw">DBCC CHECKDB</span>(<span class="tbl">GradosTitulos</span>, REPAIR_ALLOW_DATA_LOSS)
-      <span class="kw">WITH</span> ALL_ERRORMSGS;
+<span class="cm">-- Intentar reparación (ÚLTIMO RECURSO - puede haber pérdida)</span>
+<span class="kw">DBCC CHECKDB</span>(<span class="tbl">GradosTitulos</span>, REPAIR_ALLOW_DATA_LOSS)
+    <span class="kw">WITH</span> ALL_ERRORMSGS;
 
-  <span class="cm">-- Si la reparación no es viable: restaurar desde backup</span>
-  <span class="kw">ALTER DATABASE</span> <span class="tbl">GradosTitulos</span> <span class="kw">SET MULTI_USER</span>;
+<span class="cm">-- Si la reparación no es viable: restaurar desde backup</span>
+<span class="kw">ALTER DATABASE</span> <span class="tbl">GradosTitulos</span> <span class="kw">SET MULTI_USER</span>;
 
-  <span class="cm">-- Tail-log si el log no está corrupto</span>
-  <span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\GT_TailLog_Corrupcion.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY, NO_TRUNCATE;
+<span class="cm">-- Tail-log si el log no está corrupto</span>
+<span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\GT_TailLog_Corrupcion.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY, NO_TRUNCATE;
 
-  <span class="cm">-- Restaurar cadena completa</span>
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Ultimo.bak'</span>
-      <span class="kw">WITH</span> NORECOVERY, REPLACE,
-      MOVE <span class="str">'GradosTitulos'</span>     <span class="kw">TO</span> <span class="str">'C:\Data\GradosTitulos.mdf'</span>,
-      MOVE <span class="str">'GradosTitulos_log'</span> <span class="kw">TO</span> <span class="str">'C:\Log\GradosTitulos_log.ldf'</span>;
+<span class="cm">-- Restaurar cadena completa</span>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Ultimo.bak'</span>
+    <span class="kw">WITH</span> NORECOVERY, REPLACE,
+    MOVE <span class="str">'GradosTitulos'</span>     <span class="kw">TO</span> <span class="str">'C:\Data\GradosTitulos.mdf'</span>,
+    MOVE <span class="str">'GradosTitulos_log'</span> <span class="kw">TO</span> <span class="str">'C:\Log\GradosTitulos_log.ldf'</span>;
 
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span> <span class="kw">WITH RECOVERY</span>;</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>DBCC CHECKDB es la herramienta oficial de SQL Server para detectar corrupción.</li>
-              <li>Modo EMERGENCY permite SELECT de datos aunque la BD esté dañada.</li>
-              <li>REPAIR_ALLOW_DATA_LOSS solo como último recurso (puede perder datos).</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Ejecutar DBCC CHECKDB semanalmente de forma programada.</li>
-              <li>Restaurar desde backup siempre que sea posible (no usar REPAIR).</li>
-              <li>Monitorear el Event Viewer del SO para señales de fallo de disco anticipado.</li>
-            </ul>
-          </div>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span> <span class="kw">WITH RECOVERY</span>;</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>DBCC CHECKDB es la herramienta oficial de SQL Server para detectar corrupción.</li>
+            <li>Modo EMERGENCY permite SELECT de datos aunque la BD esté dañada.</li>
+            <li>REPAIR_ALLOW_DATA_LOSS solo como último recurso (puede perder datos).</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Ejecutar DBCC CHECKDB semanalmente de forma programada.</li>
+            <li>Restaurar desde backup siempre que sea posible (no usar REPAIR).</li>
+            <li>Monitorear el Event Viewer del SO para señales de fallo de disco anticipado.</li>
+          </ul>
         </div>
       </div>
     </div>
-  </div><!-- /t2 -->
+  </div>
+</div><!-- /t2 -->
 
 
-  <!-- ════════════════════════════════════════
-      TEMA 3 – VERIFICACIÓN
-  ════════════════════════════════════════ -->
-  <div id="t3" class="section">
-    <div class="infog-header h-sage">
-      <div class="icon">✅</div>
-      <div>
-        <h2>Tema 3 · Mantenimiento y Verificación de Copias de Seguridad</h2>
-        <p>Validación de integridad, inventario histórico y detección de respaldos obsoletos</p>
-      </div>
+<!-- ════════════════════════════════════════
+     TEMA 3 – VERIFICACIÓN
+════════════════════════════════════════ -->
+<div id="t3" class="section">
+  <div class="infog-header h-sage">
+    <div class="icon">✅</div>
+    <div>
+      <h2>Tema 3 · Mantenimiento y Verificación de Copias de Seguridad</h2>
+      <p>Validación de integridad, inventario histórico y detección de respaldos obsoletos</p>
     </div>
+  </div>
 
-    <div class="infog-grid">
-      <div class="infog-card c-sage">
-        <span class="card-emoji">🔍</span>
-        <h3>RESTORE VERIFYONLY</h3>
-        <p>Valida un backup sin restaurarlo. Confirma que el archivo es legible y su checksum es correcto.</p>
-        <div class="badge-row"><span class="badge b-s">Sin restaurar</span><span class="badge b-s">Rápido</span></div>
-      </div>
-      <div class="infog-card c-sage">
-        <span class="card-emoji">📊</span>
-        <h3>msdb.dbo.backupset</h3>
-        <p>Tabla del sistema con el historial completo de todos los backups ejecutados en el servidor.</p>
-        <div class="badge-row"><span class="badge b-s">Catálogo</span><span class="badge b-s">Historial</span></div>
-      </div>
-      <div class="infog-card c-sage">
-        <span class="card-emoji">🗑️</span>
-        <h3>Retención y Limpieza</h3>
-        <p>Identificar y eliminar backups obsoletos según la política institucional (30, 90, 180 días).</p>
-        <div class="badge-row"><span class="badge b-s">Policy</span><span class="badge b-s">Retención</span></div>
-      </div>
-      <div class="infog-card c-sage">
-        <span class="card-emoji">🤖</span>
-        <h3>Verificación Automática</h3>
-        <p>Job de SQL Agent que valida diariamente todos los backups y alerta si alguno falla.</p>
-        <div class="badge-row"><span class="badge b-s">Automatizado</span><span class="badge b-s">Alertas</span></div>
-      </div>
+  <div class="infog-grid">
+    <div class="infog-card c-sage">
+      <span class="card-emoji">🔍</span>
+      <h3>RESTORE VERIFYONLY</h3>
+      <p>Valida un backup sin restaurarlo. Confirma que el archivo es legible y su checksum es correcto.</p>
+      <div class="badge-row"><span class="badge b-s">Sin restaurar</span><span class="badge b-s">Rápido</span></div>
     </div>
+    <div class="infog-card c-sage">
+      <span class="card-emoji">📊</span>
+      <h3>msdb.dbo.backupset</h3>
+      <p>Tabla del sistema con el historial completo de todos los backups ejecutados en el servidor.</p>
+      <div class="badge-row"><span class="badge b-s">Catálogo</span><span class="badge b-s">Historial</span></div>
+    </div>
+    <div class="infog-card c-sage">
+      <span class="card-emoji">🗑️</span>
+      <h3>Retención y Limpieza</h3>
+      <p>Identificar y eliminar backups obsoletos según la política institucional (30, 90, 180 días).</p>
+      <div class="badge-row"><span class="badge b-s">Policy</span><span class="badge b-s">Retención</span></div>
+    </div>
+    <div class="infog-card c-sage">
+      <span class="card-emoji">🤖</span>
+      <h3>Verificación Automática</h3>
+      <p>Job de SQL Agent que valida diariamente todos los backups y alerta si alguno falla.</p>
+      <div class="badge-row"><span class="badge b-s">Automatizado</span><span class="badge b-s">Alertas</span></div>
+    </div>
+  </div>
 
-    <div class="section-divider">📁 Proyectos Prácticos</div>
+  <div class="section-divider">📁 Proyectos Prácticos</div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#6DB56A">1</div>
-        <h3>Verificación de Integridad de Backups</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Verificar que todos los respaldos generados para GradosTitulos sean recuperables.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Verificar backup sin restaurar</span>
-  <span class="kw">RESTORE</span> VERIFYONLY
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Ultimo.bak'</span>
-      <span class="kw">WITH CHECKSUM</span>;
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#6DB56A">1</div>
+      <h3>Verificación de Integridad de Backups</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Verificar que todos los respaldos generados para GradosTitulos sean recuperables.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Verificar backup sin restaurar</span>
+<span class="kw">RESTORE</span> VERIFYONLY
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Ultimo.bak'</span>
+    <span class="kw">WITH CHECKSUM</span>;
 
-  <span class="cm">-- Verificar y obtener información del backup</span>
-  <span class="kw">RESTORE</span> HEADERONLY
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Ultimo.bak'</span>;
+<span class="cm">-- Verificar y obtener información del backup</span>
+<span class="kw">RESTORE</span> HEADERONLY
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Ultimo.bak'</span>;
 
-  <span class="cm">-- Listar todos los backups NO verificados del último día</span>
-  <span class="kw">SELECT</span>
-      bs.database_name,
-      bs.backup_start_date,
-      bs.backup_finish_date,
-      <span class="fn">CASE</span> bs.type
-          <span class="kw">WHEN</span> <span class="str">'D'</span> <span class="kw">THEN</span> <span class="str">'Full'</span>
-          <span class="kw">WHEN</span> <span class="str">'I'</span> <span class="kw">THEN</span> <span class="str">'Diferencial'</span>
-          <span class="kw">WHEN</span> <span class="str">'L'</span> <span class="kw">THEN</span> <span class="str">'Log'</span>
-      <span class="kw">END</span> <span class="kw">AS</span> TipoBackup,
-      bmf.physical_device_name <span class="kw">AS</span> archivo,
-      bs.is_damaged
-  <span class="kw">FROM</span>   msdb.dbo.backupset bs
-  <span class="kw">JOIN</span>   msdb.dbo.backupmediafamily bmf
-      <span class="kw">ON</span> bs.media_set_id = bmf.media_set_id
-  <span class="kw">WHERE</span>  bs.database_name = <span class="str">'GradosTitulos'</span>
-    <span class="kw">AND</span>  bs.backup_finish_date >= <span class="fn">DATEADD</span>(<span class="kw">DAY</span>,-<span class="num">1</span>,<span class="fn">GETDATE</span>())
-  <span class="kw">ORDER BY</span> bs.backup_start_date <span class="kw">DESC</span>;</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>is_damaged = 1 indica que SQL Server detectó corrupción al escribir el backup.</li>
-              <li>RESTORE HEADERONLY muestra metadatos sin leer todos los datos del backup.</li>
-              <li>backupmediafamily contiene la ruta física del archivo de backup.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Nunca confiar en un backup que no ha sido verificado con VERIFYONLY.</li>
-              <li>Automatizar la verificación como paso final de cada job de backup.</li>
-            </ul>
-          </div>
+<span class="cm">-- Listar todos los backups NO verificados del último día</span>
+<span class="kw">SELECT</span>
+    bs.database_name,
+    bs.backup_start_date,
+    bs.backup_finish_date,
+    <span class="fn">CASE</span> bs.type
+        <span class="kw">WHEN</span> <span class="str">'D'</span> <span class="kw">THEN</span> <span class="str">'Full'</span>
+        <span class="kw">WHEN</span> <span class="str">'I'</span> <span class="kw">THEN</span> <span class="str">'Diferencial'</span>
+        <span class="kw">WHEN</span> <span class="str">'L'</span> <span class="kw">THEN</span> <span class="str">'Log'</span>
+    <span class="kw">END</span> <span class="kw">AS</span> TipoBackup,
+    bmf.physical_device_name <span class="kw">AS</span> archivo,
+    bs.is_damaged
+<span class="kw">FROM</span>   msdb.dbo.backupset bs
+<span class="kw">JOIN</span>   msdb.dbo.backupmediafamily bmf
+    <span class="kw">ON</span> bs.media_set_id = bmf.media_set_id
+<span class="kw">WHERE</span>  bs.database_name = <span class="str">'GradosTitulos'</span>
+  <span class="kw">AND</span>  bs.backup_finish_date >= <span class="fn">DATEADD</span>(<span class="kw">DAY</span>,-<span class="num">1</span>,<span class="fn">GETDATE</span>())
+<span class="kw">ORDER BY</span> bs.backup_start_date <span class="kw">DESC</span>;</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>is_damaged = 1 indica que SQL Server detectó corrupción al escribir el backup.</li>
+            <li>RESTORE HEADERONLY muestra metadatos sin leer todos los datos del backup.</li>
+            <li>backupmediafamily contiene la ruta física del archivo de backup.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Nunca confiar en un backup que no ha sido verificado con VERIFYONLY.</li>
+            <li>Automatizar la verificación como paso final de cada job de backup.</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#6DB56A">2</div>
-        <h3>Inventario Histórico de Copias de Seguridad (último mes)</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Construir un reporte que muestre todos los respaldos realizados durante el último mes.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Reporte completo del último mes</span>
-  <span class="kw">SELECT</span>
-      <span class="fn">CASE</span> bs.type
-          <span class="kw">WHEN</span> <span class="str">'D'</span> <span class="kw">THEN</span> <span class="str">'🗂 Full'</span>
-          <span class="kw">WHEN</span> <span class="str">'I'</span> <span class="kw">THEN</span> <span class="str">'📋 Diferencial'</span>
-          <span class="kw">WHEN</span> <span class="str">'L'</span> <span class="kw">THEN</span> <span class="str">'📝 Log'</span>
-      <span class="kw">END</span>                              <span class="kw">AS</span> Tipo,
-      <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,bs.backup_start_date,<span class="num">103</span>)  <span class="kw">AS</span> Fecha,
-      <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,bs.backup_start_date,<span class="num">108</span>)  <span class="kw">AS</span> Hora,
-      <span class="fn">DATEDIFF</span>(<span class="kw">MINUTE</span>,bs.backup_start_date,
-              bs.backup_finish_date)              <span class="kw">AS</span> DuracionMin,
-      <span class="fn">ROUND</span>(bs.backup_size/<span class="num">1024.0</span>/<span class="num">1024</span>,<span class="num">2</span>)         <span class="kw">AS</span> TamañoMB,
-      <span class="fn">ROUND</span>(bs.compressed_backup_size/<span class="num">1024.0</span>/<span class="num">1024</span>,<span class="num">2</span>) <span class="kw">AS</span> ComprimidoMB,
-      bmf.physical_device_name                    <span class="kw">AS</span> Archivo
-  <span class="kw">FROM</span>   msdb.dbo.backupset bs
-  <span class="kw">JOIN</span>   msdb.dbo.backupmediafamily bmf
-      <span class="kw">ON</span> bs.media_set_id = bmf.media_set_id
-  <span class="kw">WHERE</span>  bs.database_name = <span class="str">'GradosTitulos'</span>
-    <span class="kw">AND</span>  bs.backup_finish_date >=
-        <span class="fn">DATEADD</span>(<span class="kw">MONTH</span>,-<span class="num">1</span>,<span class="fn">GETDATE</span>())
-  <span class="kw">ORDER BY</span> bs.backup_start_date <span class="kw">DESC</span>;</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>El ratio TamañoMB / ComprimidoMB permite evaluar la efectividad de la compresión.</li>
-              <li>DuracionMin permite detectar backups que tardaron más de lo habitual (posible problema).</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Exportar este reporte a Excel mensualmente para la auditoría de TI.</li>
-              <li>Comparar tamaños entre semanas para detectar crecimiento anormal.</li>
-            </ul>
-          </div>
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#6DB56A">2</div>
+      <h3>Inventario Histórico de Copias de Seguridad (último mes)</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Construir un reporte que muestre todos los respaldos realizados durante el último mes.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Reporte completo del último mes</span>
+<span class="kw">SELECT</span>
+    <span class="fn">CASE</span> bs.type
+        <span class="kw">WHEN</span> <span class="str">'D'</span> <span class="kw">THEN</span> <span class="str">'🗂 Full'</span>
+        <span class="kw">WHEN</span> <span class="str">'I'</span> <span class="kw">THEN</span> <span class="str">'📋 Diferencial'</span>
+        <span class="kw">WHEN</span> <span class="str">'L'</span> <span class="kw">THEN</span> <span class="str">'📝 Log'</span>
+    <span class="kw">END</span>                              <span class="kw">AS</span> Tipo,
+    <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,bs.backup_start_date,<span class="num">103</span>)  <span class="kw">AS</span> Fecha,
+    <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,bs.backup_start_date,<span class="num">108</span>)  <span class="kw">AS</span> Hora,
+    <span class="fn">DATEDIFF</span>(<span class="kw">MINUTE</span>,bs.backup_start_date,
+             bs.backup_finish_date)              <span class="kw">AS</span> DuracionMin,
+    <span class="fn">ROUND</span>(bs.backup_size/<span class="num">1024.0</span>/<span class="num">1024</span>,<span class="num">2</span>)         <span class="kw">AS</span> TamañoMB,
+    <span class="fn">ROUND</span>(bs.compressed_backup_size/<span class="num">1024.0</span>/<span class="num">1024</span>,<span class="num">2</span>) <span class="kw">AS</span> ComprimidoMB,
+    bmf.physical_device_name                    <span class="kw">AS</span> Archivo
+<span class="kw">FROM</span>   msdb.dbo.backupset bs
+<span class="kw">JOIN</span>   msdb.dbo.backupmediafamily bmf
+    <span class="kw">ON</span> bs.media_set_id = bmf.media_set_id
+<span class="kw">WHERE</span>  bs.database_name = <span class="str">'GradosTitulos'</span>
+  <span class="kw">AND</span>  bs.backup_finish_date >=
+       <span class="fn">DATEADD</span>(<span class="kw">MONTH</span>,-<span class="num">1</span>,<span class="fn">GETDATE</span>())
+<span class="kw">ORDER BY</span> bs.backup_start_date <span class="kw">DESC</span>;</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>El ratio TamañoMB / ComprimidoMB permite evaluar la efectividad de la compresión.</li>
+            <li>DuracionMin permite detectar backups que tardaron más de lo habitual (posible problema).</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Exportar este reporte a Excel mensualmente para la auditoría de TI.</li>
+            <li>Comparar tamaños entre semanas para detectar crecimiento anormal.</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#6DB56A">3</div>
-        <h3>Detección de Respaldos Obsoletos</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Identificar copias de seguridad que excedan la política institucional de retención.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Backups fuera de política de retención (más de 90 días)</span>
-  <span class="kw">SELECT</span>
-      bs.database_name,
-      <span class="fn">CASE</span> bs.type
-          <span class="kw">WHEN</span> <span class="str">'D'</span> <span class="kw">THEN</span> <span class="str">'Full'</span>
-          <span class="kw">WHEN</span> <span class="str">'I'</span> <span class="kw">THEN</span> <span class="str">'Diferencial'</span>
-          <span class="kw">WHEN</span> <span class="str">'L'</span> <span class="kw">THEN</span> <span class="str">'Log'</span>
-      <span class="kw">END</span>                            <span class="kw">AS</span> TipoBackup,
-      bs.backup_finish_date          <span class="kw">AS</span> FechaBackup,
-      <span class="fn">DATEDIFF</span>(<span class="kw">DAY</span>,bs.backup_finish_date,<span class="fn">GETDATE</span>()) <span class="kw">AS</span> DiasAntiguedad,
-      bmf.physical_device_name       <span class="kw">AS</span> ArchivoFisico,
-      <span class="fn">ROUND</span>(bs.backup_size/<span class="num">1024.0</span>/<span class="num">1024</span>,<span class="num">2</span>) <span class="kw">AS</span> TamañoMB
-  <span class="kw">FROM</span>   msdb.dbo.backupset bs
-  <span class="kw">JOIN</span>   msdb.dbo.backupmediafamily bmf
-      <span class="kw">ON</span> bs.media_set_id = bmf.media_set_id
-  <span class="kw">WHERE</span>  bs.database_name = <span class="str">'GradosTitulos'</span>
-    <span class="kw">AND</span>  bs.backup_finish_date < <span class="fn">DATEADD</span>(<span class="kw">DAY</span>,-<span class="num">90</span>,<span class="fn">GETDATE</span>())
-  <span class="kw">ORDER BY</span> bs.backup_finish_date;
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#6DB56A">3</div>
+      <h3>Detección de Respaldos Obsoletos</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Identificar copias de seguridad que excedan la política institucional de retención.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Backups fuera de política de retención (más de 90 días)</span>
+<span class="kw">SELECT</span>
+    bs.database_name,
+    <span class="fn">CASE</span> bs.type
+        <span class="kw">WHEN</span> <span class="str">'D'</span> <span class="kw">THEN</span> <span class="str">'Full'</span>
+        <span class="kw">WHEN</span> <span class="str">'I'</span> <span class="kw">THEN</span> <span class="str">'Diferencial'</span>
+        <span class="kw">WHEN</span> <span class="str">'L'</span> <span class="kw">THEN</span> <span class="str">'Log'</span>
+    <span class="kw">END</span>                            <span class="kw">AS</span> TipoBackup,
+    bs.backup_finish_date          <span class="kw">AS</span> FechaBackup,
+    <span class="fn">DATEDIFF</span>(<span class="kw">DAY</span>,bs.backup_finish_date,<span class="fn">GETDATE</span>()) <span class="kw">AS</span> DiasAntiguedad,
+    bmf.physical_device_name       <span class="kw">AS</span> ArchivoFisico,
+    <span class="fn">ROUND</span>(bs.backup_size/<span class="num">1024.0</span>/<span class="num">1024</span>,<span class="num">2</span>) <span class="kw">AS</span> TamañoMB
+<span class="kw">FROM</span>   msdb.dbo.backupset bs
+<span class="kw">JOIN</span>   msdb.dbo.backupmediafamily bmf
+    <span class="kw">ON</span> bs.media_set_id = bmf.media_set_id
+<span class="kw">WHERE</span>  bs.database_name = <span class="str">'GradosTitulos'</span>
+  <span class="kw">AND</span>  bs.backup_finish_date < <span class="fn">DATEADD</span>(<span class="kw">DAY</span>,-<span class="num">90</span>,<span class="fn">GETDATE</span>())
+<span class="kw">ORDER BY</span> bs.backup_finish_date;
 
-  <span class="cm">-- Limpiar registros de msdb (no borra archivos físicos)</span>
-  <span class="kw">EXEC</span> msdb.dbo.<span class="fn">sp_delete_backuphistory</span>
-      @oldest_date = <span class="fn">DATEADD</span>(<span class="kw">DAY</span>,-<span class="num">90</span>,<span class="fn">GETDATE</span>());</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>sp_delete_backuphistory limpia solo el catálogo en msdb, no los archivos físicos.</li>
-              <li>Los archivos .bak/.trn deben eliminarse por separado (script PowerShell o Maintenance Plan).</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Nunca eliminar backups manualmente sin confirmación de que existen backups más recientes válidos.</li>
-              <li>Usar Maintenance Plan "Cleanup Task" para borrar archivos .bak/.trn automáticamente.</li>
-            </ul>
-          </div>
+<span class="cm">-- Limpiar registros de msdb (no borra archivos físicos)</span>
+<span class="kw">EXEC</span> msdb.dbo.<span class="fn">sp_delete_backuphistory</span>
+    @oldest_date = <span class="fn">DATEADD</span>(<span class="kw">DAY</span>,-<span class="num">90</span>,<span class="fn">GETDATE</span>());</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>sp_delete_backuphistory limpia solo el catálogo en msdb, no los archivos físicos.</li>
+            <li>Los archivos .bak/.trn deben eliminarse por separado (script PowerShell o Maintenance Plan).</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Nunca eliminar backups manualmente sin confirmación de que existen backups más recientes válidos.</li>
+            <li>Usar Maintenance Plan "Cleanup Task" para borrar archivos .bak/.trn automáticamente.</li>
+          </ul>
         </div>
       </div>
     </div>
-  </div><!-- /t3 -->
+  </div>
+</div><!-- /t3 -->
 
 
-  <!-- ════════════════════════════════════════
-      TEMA 4 – BACKUP DATABASE / RESTORE
-  ════════════════════════════════════════ -->
-  <div id="t4" class="section">
-    <div class="infog-header h-amber">
-      <div class="icon">💿</div>
-      <div>
-        <h2>Tema 4 · Uso de BACKUP DATABASE y RESTORE DATABASE</h2>
-        <p>Comandos T-SQL para respaldo y restauración manual y automatizada</p>
-      </div>
+<!-- ════════════════════════════════════════
+     TEMA 4 – BACKUP DATABASE / RESTORE
+════════════════════════════════════════ -->
+<div id="t4" class="section">
+  <div class="infog-header h-amber">
+    <div class="icon">💿</div>
+    <div>
+      <h2>Tema 4 · Uso de BACKUP DATABASE y RESTORE DATABASE</h2>
+      <p>Comandos T-SQL para respaldo y restauración manual y automatizada</p>
     </div>
+  </div>
 
-    <div class="infog-grid">
-      <div class="infog-card c-amber">
-        <span class="card-emoji">💾</span>
-        <h3>BACKUP DATABASE</h3>
-        <p>Comando base para backups completos y diferenciales. Soporta compresión, checksum y múltiples destinos.</p>
-        <div class="badge-row"><span class="badge b-a">TO DISK</span><span class="badge b-a">COMPRESSION</span><span class="badge b-a">CHECKSUM</span></div>
-      </div>
-      <div class="infog-card c-amber">
-        <span class="card-emoji">📀</span>
-        <h3>RESTORE DATABASE</h3>
-        <p>Restaura una BD desde un archivo .bak. Con NORECOVERY permite aplicar logs adicionales.</p>
-        <div class="badge-row"><span class="badge b-a">NORECOVERY</span><span class="badge b-a">RECOVERY</span><span class="badge b-a">MOVE</span></div>
-      </div>
-      <div class="infog-card c-amber">
-        <span class="card-emoji">⚙️</span>
-        <h3>Stored Procedures</h3>
-        <p>Encapsular BACKUP/RESTORE en procedimientos reutilizables. Nombre de archivo dinámico con fecha/hora.</p>
-        <div class="badge-row"><span class="badge b-a">Reutilizable</span><span class="badge b-a">Dinámico</span></div>
-      </div>
-      <div class="infog-card c-amber">
-        <span class="card-emoji">🔎</span>
-        <h3>RESTORE HEADERONLY</h3>
-        <p>Lee los metadatos de un archivo de backup sin restaurar. Muestra BD, fecha, tipo y LSN.</p>
-        <div class="badge-row"><span class="badge b-a">Metadatos</span><span class="badge b-a">LSN</span></div>
-      </div>
+  <div class="infog-grid">
+    <div class="infog-card c-amber">
+      <span class="card-emoji">💾</span>
+      <h3>BACKUP DATABASE</h3>
+      <p>Comando base para backups completos y diferenciales. Soporta compresión, checksum y múltiples destinos.</p>
+      <div class="badge-row"><span class="badge b-a">TO DISK</span><span class="badge b-a">COMPRESSION</span><span class="badge b-a">CHECKSUM</span></div>
     </div>
+    <div class="infog-card c-amber">
+      <span class="card-emoji">📀</span>
+      <h3>RESTORE DATABASE</h3>
+      <p>Restaura una BD desde un archivo .bak. Con NORECOVERY permite aplicar logs adicionales.</p>
+      <div class="badge-row"><span class="badge b-a">NORECOVERY</span><span class="badge b-a">RECOVERY</span><span class="badge b-a">MOVE</span></div>
+    </div>
+    <div class="infog-card c-amber">
+      <span class="card-emoji">⚙️</span>
+      <h3>Stored Procedures</h3>
+      <p>Encapsular BACKUP/RESTORE en procedimientos reutilizables. Nombre de archivo dinámico con fecha/hora.</p>
+      <div class="badge-row"><span class="badge b-a">Reutilizable</span><span class="badge b-a">Dinámico</span></div>
+    </div>
+    <div class="infog-card c-amber">
+      <span class="card-emoji">🔎</span>
+      <h3>RESTORE HEADERONLY</h3>
+      <p>Lee los metadatos de un archivo de backup sin restaurar. Muestra BD, fecha, tipo y LSN.</p>
+      <div class="badge-row"><span class="badge b-a">Metadatos</span><span class="badge b-a">LSN</span></div>
+    </div>
+  </div>
 
-    <div class="section-divider">📁 Proyectos Prácticos</div>
+  <div class="section-divider">📁 Proyectos Prácticos</div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#C9980A">1</div>
-        <h3>Respaldo Manual de GradosTitulos con T-SQL</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Realizar un respaldo completo usando únicamente instrucciones T-SQL.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Backup completo manual</span>
-  <span class="kw">BACKUP DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\GT_Manual_</span>'
-            + <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">112</span>)+<span class="str">'.bak'</span>
-      <span class="kw">WITH</span>
-          COMPRESSION,
-          CHECKSUM,
-          INIT,
-          NAME = <span class="str">'GradosTitulos Backup Manual'</span>,
-          DESCRIPTION = <span class="str">'Backup generado manualmente por DBA'</span>,
-          STATS = <span class="num">10</span>;  <span class="cm">-- Muestra progreso cada 10%</span>
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#C9980A">1</div>
+      <h3>Respaldo Manual de GradosTitulos con T-SQL</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Realizar un respaldo completo usando únicamente instrucciones T-SQL.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Backup completo manual</span>
+<span class="kw">BACKUP DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\GT_Manual_</span>'
+           + <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">112</span>)+<span class="str">'.bak'</span>
+    <span class="kw">WITH</span>
+        COMPRESSION,
+        CHECKSUM,
+        INIT,
+        NAME = <span class="str">'GradosTitulos Backup Manual'</span>,
+        DESCRIPTION = <span class="str">'Backup generado manualmente por DBA'</span>,
+        STATS = <span class="num">10</span>;  <span class="cm">-- Muestra progreso cada 10%</span>
 
-  <span class="cm">-- Confirmar que el backup fue registrado</span>
-  <span class="kw">SELECT TOP</span> <span class="num">1</span>
-      backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> TamañoMB,
-      compressed_backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> ComprimidoMB,
-      backup_finish_date
-  <span class="kw">FROM</span>   msdb.dbo.backupset
-  <span class="kw">WHERE</span>  database_name = <span class="str">'GradosTitulos'</span>
-  <span class="kw">ORDER BY</span> backup_finish_date <span class="kw">DESC</span>;</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>STATS = 10 muestra el avance del backup en porcentaje en mensajes de SSMS.</li>
-              <li>INIT sobrescribe el archivo si ya existe (útil para backup diario con nombre fijo).</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Agregar NAME y DESCRIPTION para identificar fácilmente el backup.</li>
-              <li>Verificar con RESTORE HEADERONLY que el archivo fue creado correctamente.</li>
-            </ul>
-          </div>
+<span class="cm">-- Confirmar que el backup fue registrado</span>
+<span class="kw">SELECT TOP</span> <span class="num">1</span>
+    backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> TamañoMB,
+    compressed_backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> ComprimidoMB,
+    backup_finish_date
+<span class="kw">FROM</span>   msdb.dbo.backupset
+<span class="kw">WHERE</span>  database_name = <span class="str">'GradosTitulos'</span>
+<span class="kw">ORDER BY</span> backup_finish_date <span class="kw">DESC</span>;</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>STATS = 10 muestra el avance del backup en porcentaje en mensajes de SSMS.</li>
+            <li>INIT sobrescribe el archivo si ya existe (útil para backup diario con nombre fijo).</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Agregar NAME y DESCRIPTION para identificar fácilmente el backup.</li>
+            <li>Verificar con RESTORE HEADERONLY que el archivo fue creado correctamente.</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#C9980A">5</div>
-        <h3>Framework Automatizado de Respaldo Institucional</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Desarrollar un procedimiento almacenado reutilizable que genere respaldos completos de GradosTitulos con fecha y hora en el nombre del archivo.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Framework completo de respaldo automatizado</span>
-  <span class="kw">CREATE OR ALTER PROCEDURE</span> <span class="fn">usp_FrameworkBackup</span>
-      @BaseDatos  <span class="kw">SYSNAME</span>      = <span class="str">'GradosTitulos'</span>,
-      @TipoBackup <span class="kw">VARCHAR</span>(<span class="num">4</span>)  = <span class="str">'FULL'</span>,
-      @RutaBase   <span class="kw">NVARCHAR</span>(<span class="num">256</span>) = <span class="str">'C:\Backups\'</span>
-  <span class="kw">AS</span>
-  <span class="kw">BEGIN</span>
-      <span class="kw">SET NOCOUNT ON</span>
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#C9980A">5</div>
+      <h3>Framework Automatizado de Respaldo Institucional</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Desarrollar un procedimiento almacenado reutilizable que genere respaldos completos de GradosTitulos con fecha y hora en el nombre del archivo.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Framework completo de respaldo automatizado</span>
+<span class="kw">CREATE OR ALTER PROCEDURE</span> <span class="fn">usp_FrameworkBackup</span>
+    @BaseDatos  <span class="kw">SYSNAME</span>      = <span class="str">'GradosTitulos'</span>,
+    @TipoBackup <span class="kw">VARCHAR</span>(<span class="num">4</span>)  = <span class="str">'FULL'</span>,
+    @RutaBase   <span class="kw">NVARCHAR</span>(<span class="num">256</span>) = <span class="str">'C:\Backups\'</span>
+<span class="kw">AS</span>
+<span class="kw">BEGIN</span>
+    <span class="kw">SET NOCOUNT ON</span>
 
-      <span class="kw">DECLARE</span> @ts     <span class="kw">VARCHAR</span>(<span class="num">20</span>)
-      <span class="kw">DECLARE</span> @ext    <span class="kw">VARCHAR</span>(<span class="num">4</span>)
-      <span class="kw">DECLARE</span> @subdir <span class="kw">VARCHAR</span>(<span class="num">10</span>)
-      <span class="kw">DECLARE</span> @ruta   <span class="kw">NVARCHAR</span>(<span class="num">500</span>)
-      <span class="kw">DECLARE</span> @sql    <span class="kw">NVARCHAR</span>(<span class="num">MAX</span>)
+    <span class="kw">DECLARE</span> @ts     <span class="kw">VARCHAR</span>(<span class="num">20</span>)
+    <span class="kw">DECLARE</span> @ext    <span class="kw">VARCHAR</span>(<span class="num">4</span>)
+    <span class="kw">DECLARE</span> @subdir <span class="kw">VARCHAR</span>(<span class="num">10</span>)
+    <span class="kw">DECLARE</span> @ruta   <span class="kw">NVARCHAR</span>(<span class="num">500</span>)
+    <span class="kw">DECLARE</span> @sql    <span class="kw">NVARCHAR</span>(<span class="num">MAX</span>)
 
-      <span class="kw">SET</span> @ts = <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">112</span>)
-              + <span class="fn">REPLACE</span>(<span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">108</span>),<span class="str">':'</span>,<span class="str">''</span>)
+    <span class="kw">SET</span> @ts = <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">112</span>)
+            + <span class="fn">REPLACE</span>(<span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,<span class="fn">GETDATE</span>(),<span class="num">108</span>),<span class="str">':'</span>,<span class="str">''</span>)
 
-      <span class="kw">SELECT</span>
-          @ext    = <span class="kw">CASE</span> @TipoBackup <span class="kw">WHEN</span> <span class="str">'LOG'</span> <span class="kw">THEN</span> <span class="str">'.trn'</span> <span class="kw">ELSE</span> <span class="str">'.bak'</span> <span class="kw">END</span>,
-          @subdir = <span class="kw">CASE</span> @TipoBackup
-                        <span class="kw">WHEN</span> <span class="str">'FULL'</span> <span class="kw">THEN</span> <span class="str">'Full\'</span>
-                        <span class="kw">WHEN</span> <span class="str">'DIFF'</span> <span class="kw">THEN</span> <span class="str">'Diff\'</span>
-                        <span class="kw">ELSE</span> <span class="str">'Log\'</span>
-                    <span class="kw">END</span>
+    <span class="kw">SELECT</span>
+        @ext    = <span class="kw">CASE</span> @TipoBackup <span class="kw">WHEN</span> <span class="str">'LOG'</span> <span class="kw">THEN</span> <span class="str">'.trn'</span> <span class="kw">ELSE</span> <span class="str">'.bak'</span> <span class="kw">END</span>,
+        @subdir = <span class="kw">CASE</span> @TipoBackup
+                      <span class="kw">WHEN</span> <span class="str">'FULL'</span> <span class="kw">THEN</span> <span class="str">'Full\'</span>
+                      <span class="kw">WHEN</span> <span class="str">'DIFF'</span> <span class="kw">THEN</span> <span class="str">'Diff\'</span>
+                      <span class="kw">ELSE</span> <span class="str">'Log\'</span>
+                  <span class="kw">END</span>
 
-      <span class="kw">SET</span> @ruta = @RutaBase + @subdir
-                + @BaseDatos + <span class="str">'_'</span> + @TipoBackup
-                + <span class="str">'_'</span> + @ts + @ext
+    <span class="kw">SET</span> @ruta = @RutaBase + @subdir
+              + @BaseDatos + <span class="str">'_'</span> + @TipoBackup
+              + <span class="str">'_'</span> + @ts + @ext
 
-      <span class="kw">SET</span> @sql = <span class="kw">CASE</span> @TipoBackup
-          <span class="kw">WHEN</span> <span class="str">'LOG'</span>
-          <span class="kw">THEN</span> <span class="str">'BACKUP LOG '</span>+@BaseDatos+<span class="str">' TO DISK='''</span>+@ruta+<span class="str">''' WITH COMPRESSION,CHECKSUM'</span>
-          <span class="kw">ELSE</span> <span class="str">'BACKUP DATABASE '</span>+@BaseDatos+<span class="str">' TO DISK='''</span>+@ruta+<span class="str">''' WITH COMPRESSION,CHECKSUM'</span>
-            + <span class="kw">CASE WHEN</span> @TipoBackup=<span class="str">'DIFF'</span> <span class="kw">THEN</span> <span class="str">',DIFFERENTIAL'</span> <span class="kw">ELSE</span> <span class="str">''</span> <span class="kw">END</span>
-      <span class="kw">END</span>
+    <span class="kw">SET</span> @sql = <span class="kw">CASE</span> @TipoBackup
+        <span class="kw">WHEN</span> <span class="str">'LOG'</span>
+        <span class="kw">THEN</span> <span class="str">'BACKUP LOG '</span>+@BaseDatos+<span class="str">' TO DISK='''</span>+@ruta+<span class="str">''' WITH COMPRESSION,CHECKSUM'</span>
+        <span class="kw">ELSE</span> <span class="str">'BACKUP DATABASE '</span>+@BaseDatos+<span class="str">' TO DISK='''</span>+@ruta+<span class="str">''' WITH COMPRESSION,CHECKSUM'</span>
+           + <span class="kw">CASE WHEN</span> @TipoBackup=<span class="str">'DIFF'</span> <span class="kw">THEN</span> <span class="str">',DIFFERENTIAL'</span> <span class="kw">ELSE</span> <span class="str">''</span> <span class="kw">END</span>
+    <span class="kw">END</span>
 
-      <span class="kw">EXEC</span> <span class="fn">sp_executesql</span> @sql
-      <span class="kw">EXEC</span>(<span class="str">'RESTORE VERIFYONLY FROM DISK='''</span>+@ruta+<span class="str">''' WITH CHECKSUM'</span>)
+    <span class="kw">EXEC</span> <span class="fn">sp_executesql</span> @sql
+    <span class="kw">EXEC</span>(<span class="str">'RESTORE VERIFYONLY FROM DISK='''</span>+@ruta+<span class="str">''' WITH CHECKSUM'</span>)
 
-      <span class="fn">PRINT</span> <span class="str">'OK: '</span> + @ruta
-  <span class="kw">END</span></pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>Parámetros por defecto simplifican la llamada al SP desde cualquier job.</li>
-              <li>sp_executesql construye y ejecuta SQL dinámico de forma segura.</li>
-              <li>La verificación automática integrada elimina el riesgo de backups corruptos.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Llamar al SP desde jobs de SQL Agent: EXEC usp_FrameworkBackup 'GradosTitulos','FULL'</li>
-              <li>Agregar manejo de errores con TRY/CATCH y registro en tabla de log.</li>
-            </ul>
-          </div>
+    <span class="fn">PRINT</span> <span class="str">'OK: '</span> + @ruta
+<span class="kw">END</span></pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>Parámetros por defecto simplifican la llamada al SP desde cualquier job.</li>
+            <li>sp_executesql construye y ejecuta SQL dinámico de forma segura.</li>
+            <li>La verificación automática integrada elimina el riesgo de backups corruptos.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Llamar al SP desde jobs de SQL Agent: EXEC usp_FrameworkBackup 'GradosTitulos','FULL'</li>
+            <li>Agregar manejo de errores con TRY/CATCH y registro en tabla de log.</li>
+          </ul>
         </div>
       </div>
     </div>
-  </div><!-- /t4 -->
+  </div>
+</div><!-- /t4 -->
 
 
-  <!-- ════════════════════════════════════════
-      TEMA 5 – PLANES DE MANTENIMIENTO
-  ════════════════════════════════════════ -->
-  <div id="t5" class="section">
-    <div class="infog-header h-plum">
-      <div class="icon">📋</div>
-      <div>
-        <h2>Tema 5 · Planes de Mantenimiento y Políticas de Retención</h2>
-        <p>Automatización del mantenimiento y gestión del ciclo de vida de los backups</p>
-      </div>
+<!-- ════════════════════════════════════════
+     TEMA 5 – PLANES DE MANTENIMIENTO
+════════════════════════════════════════ -->
+<div id="t5" class="section">
+  <div class="infog-header h-plum">
+    <div class="icon">📋</div>
+    <div>
+      <h2>Tema 5 · Planes de Mantenimiento y Políticas de Retención</h2>
+      <p>Automatización del mantenimiento y gestión del ciclo de vida de los backups</p>
     </div>
+  </div>
 
-    <div class="infog-grid">
-      <div class="infog-card c-plum">
-        <span class="card-emoji">📅</span>
-        <h3>Plan de Mantenimiento</h3>
-        <p>Wizard de SSMS que combina backups, reorganización de índices, actualización de estadísticas y verificación.</p>
-        <div class="badge-row"><span class="badge b-p">SSMS Wizard</span><span class="badge b-p">Automatizado</span></div>
-      </div>
-      <div class="infog-card c-plum">
-        <span class="card-emoji">🗂️</span>
-        <h3>Reorganización de Índices</h3>
-        <p>ALTER INDEX REORGANIZE para fragmentación baja (&lt;30%). ALTER INDEX REBUILD para fragmentación alta.</p>
-        <div class="badge-row"><span class="badge b-p">REORGANIZE</span><span class="badge b-p">REBUILD</span></div>
-      </div>
-      <div class="infog-card c-plum">
-        <span class="card-emoji">📊</span>
-        <h3>Actualización de Estadísticas</h3>
-        <p>UPDATE STATISTICS garantiza que el optimizador de consultas use planes de ejecución óptimos.</p>
-        <div class="badge-row"><span class="badge b-p">UPDATE STATISTICS</span><span class="badge b-p">Rendimiento</span></div>
-      </div>
-      <div class="infog-card c-plum">
-        <span class="card-emoji">🗑️</span>
-        <h3>Política de Retención</h3>
-        <p>Eliminar automáticamente backups más antiguos que N días. Balancear seguridad vs espacio en disco.</p>
-        <div class="badge-row"><span class="badge b-p">90 días</span><span class="badge b-p">180 días</span><span class="badge b-p">Limpieza</span></div>
-      </div>
+  <div class="infog-grid">
+    <div class="infog-card c-plum">
+      <span class="card-emoji">📅</span>
+      <h3>Plan de Mantenimiento</h3>
+      <p>Wizard de SSMS que combina backups, reorganización de índices, actualización de estadísticas y verificación.</p>
+      <div class="badge-row"><span class="badge b-p">SSMS Wizard</span><span class="badge b-p">Automatizado</span></div>
     </div>
+    <div class="infog-card c-plum">
+      <span class="card-emoji">🗂️</span>
+      <h3>Reorganización de Índices</h3>
+      <p>ALTER INDEX REORGANIZE para fragmentación baja (&lt;30%). ALTER INDEX REBUILD para fragmentación alta.</p>
+      <div class="badge-row"><span class="badge b-p">REORGANIZE</span><span class="badge b-p">REBUILD</span></div>
+    </div>
+    <div class="infog-card c-plum">
+      <span class="card-emoji">📊</span>
+      <h3>Actualización de Estadísticas</h3>
+      <p>UPDATE STATISTICS garantiza que el optimizador de consultas use planes de ejecución óptimos.</p>
+      <div class="badge-row"><span class="badge b-p">UPDATE STATISTICS</span><span class="badge b-p">Rendimiento</span></div>
+    </div>
+    <div class="infog-card c-plum">
+      <span class="card-emoji">🗑️</span>
+      <h3>Política de Retención</h3>
+      <p>Eliminar automáticamente backups más antiguos que N días. Balancear seguridad vs espacio en disco.</p>
+      <div class="badge-row"><span class="badge b-p">90 días</span><span class="badge b-p">180 días</span><span class="badge b-p">Limpieza</span></div>
+    </div>
+  </div>
 
-    <div class="section-divider">📁 Proyectos Prácticos</div>
+  <div class="section-divider">📁 Proyectos Prácticos</div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#9B6EC4">1</div>
-        <h3>Plan de Mantenimiento Semanal</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Creación de un Plan de Mantenimiento Semanal para GradosTitulos.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Plan semanal: Backup + Índices + Estadísticas + Integridad</span>
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#9B6EC4">1</div>
+      <h3>Plan de Mantenimiento Semanal</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Creación de un Plan de Mantenimiento Semanal para GradosTitulos.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Plan semanal: Backup + Índices + Estadísticas + Integridad</span>
 
-  <span class="cm">-- 1. Verificación de integridad</span>
-  <span class="kw">DBCC CHECKDB</span>(<span class="tbl">GradosTitulos</span>) <span class="kw">WITH</span> NO_INFOMSGS;
+<span class="cm">-- 1. Verificación de integridad</span>
+<span class="kw">DBCC CHECKDB</span>(<span class="tbl">GradosTitulos</span>) <span class="kw">WITH</span> NO_INFOMSGS;
 
-  <span class="cm">-- 2. Reorganizar índices fragmentados (< 30%)</span>
-  <span class="kw">SELECT</span>
-      <span class="fn">OBJECT_NAME</span>(ips.object_id) <span class="kw">AS</span> Tabla,
-      i.name                     <span class="kw">AS</span> Indice,
-      ips.avg_fragmentation_in_percent <span class="kw">AS</span> Fragmentacion
-  <span class="kw">FROM</span>   sys.dm_db_index_physical_stats(
-      <span class="fn">DB_ID</span>(<span class="str">'GradosTitulos'</span>), <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="str">'SAMPLED'</span>) ips
-  <span class="kw">JOIN</span>   sys.indexes i
-      <span class="kw">ON</span> ips.object_id = i.object_id
-      <span class="kw">AND</span> ips.index_id = i.index_id
-  <span class="kw">WHERE</span>  ips.avg_fragmentation_in_percent > <span class="num">5</span>
-  <span class="kw">ORDER BY</span> ips.avg_fragmentation_in_percent <span class="kw">DESC</span>;
+<span class="cm">-- 2. Reorganizar índices fragmentados (< 30%)</span>
+<span class="kw">SELECT</span>
+    <span class="fn">OBJECT_NAME</span>(ips.object_id) <span class="kw">AS</span> Tabla,
+    i.name                     <span class="kw">AS</span> Indice,
+    ips.avg_fragmentation_in_percent <span class="kw">AS</span> Fragmentacion
+<span class="kw">FROM</span>   sys.dm_db_index_physical_stats(
+    <span class="fn">DB_ID</span>(<span class="str">'GradosTitulos'</span>), <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="str">'SAMPLED'</span>) ips
+<span class="kw">JOIN</span>   sys.indexes i
+    <span class="kw">ON</span> ips.object_id = i.object_id
+    <span class="kw">AND</span> ips.index_id = i.index_id
+<span class="kw">WHERE</span>  ips.avg_fragmentation_in_percent > <span class="num">5</span>
+<span class="kw">ORDER BY</span> ips.avg_fragmentation_in_percent <span class="kw">DESC</span>;
 
-  <span class="cm">-- 3. Reconstruir índices con alta fragmentación</span>
-  <span class="kw">ALTER INDEX ALL ON</span> <span class="tbl">Tramite</span>.ExpedienteTitulacion REBUILD
-      <span class="kw">WITH</span> (ONLINE = <span class="kw">OFF</span>, FILLFACTOR = <span class="num">80</span>);
+<span class="cm">-- 3. Reconstruir índices con alta fragmentación</span>
+<span class="kw">ALTER INDEX ALL ON</span> <span class="tbl">Tramite</span>.ExpedienteTitulacion REBUILD
+    <span class="kw">WITH</span> (ONLINE = <span class="kw">OFF</span>, FILLFACTOR = <span class="num">80</span>);
 
-  <span class="cm">-- 4. Actualizar estadísticas de todos los esquemas</span>
-  <span class="kw">UPDATE STATISTICS</span> <span class="tbl">Tramite</span>.ExpedienteTitulacion <span class="kw">WITH FULLSCAN</span>;
-  <span class="kw">UPDATE STATISTICS</span> <span class="tbl">Academico</span>.Estudiante <span class="kw">WITH FULLSCAN</span>;
+<span class="cm">-- 4. Actualizar estadísticas de todos los esquemas</span>
+<span class="kw">UPDATE STATISTICS</span> <span class="tbl">Tramite</span>.ExpedienteTitulacion <span class="kw">WITH FULLSCAN</span>;
+<span class="kw">UPDATE STATISTICS</span> <span class="tbl">Academico</span>.Estudiante <span class="kw">WITH FULLSCAN</span>;
 
-  <span class="cm">-- 5. Backup completo al final</span>
-  <span class="kw">EXEC</span> <span class="fn">usp_FrameworkBackup</span> <span class="str">'GradosTitulos'</span>, <span class="str">'FULL'</span>;</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>Fragmentación &gt;30% → REBUILD; entre 5-30% → REORGANIZE (menos bloqueante).</li>
-              <li>FULLSCAN genera estadísticas más precisas (vs muestreo automático).</li>
-              <li>FILLFACTOR = 80 deja 20% libre en cada página para futuras inserciones.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Ejecutar el plan de mantenimiento en ventana de baja actividad (madrugada del domingo).</li>
-              <li>Separar en 2 jobs: uno para índices/estadísticas (sábado) y otro para backup (domingo).</li>
-            </ul>
-          </div>
+<span class="cm">-- 5. Backup completo al final</span>
+<span class="kw">EXEC</span> <span class="fn">usp_FrameworkBackup</span> <span class="str">'GradosTitulos'</span>, <span class="str">'FULL'</span>;</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>Fragmentación &gt;30% → REBUILD; entre 5-30% → REORGANIZE (menos bloqueante).</li>
+            <li>FULLSCAN genera estadísticas más precisas (vs muestreo automático).</li>
+            <li>FILLFACTOR = 80 deja 20% libre en cada página para futuras inserciones.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Ejecutar el plan de mantenimiento en ventana de baja actividad (madrugada del domingo).</li>
+            <li>Separar en 2 jobs: uno para índices/estadísticas (sábado) y otro para backup (domingo).</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#9B6EC4">6</div>
-        <h3>Política de Retención Automatizada (eliminar > 180 días)</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Diseñar una política institucional que elimine automáticamente respaldos con más de 180 días de antigüedad.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Procedimiento de limpieza de backups obsoletos</span>
-  <span class="kw">CREATE OR ALTER PROCEDURE</span> <span class="fn">usp_LimpiarBackupsObsoletos</span>
-      @DiasRetencion <span class="kw">INT</span> = <span class="num">180</span>
-  <span class="kw">AS</span>
-  <span class="kw">BEGIN</span>
-      <span class="kw">DECLARE</span> @fechaCorte <span class="kw">DATETIME</span> =
-          <span class="fn">DATEADD</span>(<span class="kw">DAY</span>, -@DiasRetencion, <span class="fn">GETDATE</span>())
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#9B6EC4">6</div>
+      <h3>Política de Retención Automatizada (eliminar > 180 días)</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Diseñar una política institucional que elimine automáticamente respaldos con más de 180 días de antigüedad.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Procedimiento de limpieza de backups obsoletos</span>
+<span class="kw">CREATE OR ALTER PROCEDURE</span> <span class="fn">usp_LimpiarBackupsObsoletos</span>
+    @DiasRetencion <span class="kw">INT</span> = <span class="num">180</span>
+<span class="kw">AS</span>
+<span class="kw">BEGIN</span>
+    <span class="kw">DECLARE</span> @fechaCorte <span class="kw">DATETIME</span> =
+        <span class="fn">DATEADD</span>(<span class="kw">DAY</span>, -@DiasRetencion, <span class="fn">GETDATE</span>())
 
-      <span class="cm">-- Mostrar qué se va a eliminar</span>
-      <span class="kw">SELECT</span>
-          database_name, type, backup_finish_date,
-          backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> TamañoMB
-      <span class="kw">FROM</span>   msdb.dbo.backupset
-      <span class="kw">WHERE</span>  database_name = <span class="str">'GradosTitulos'</span>
-        <span class="kw">AND</span>  backup_finish_date < @fechaCorte;
+    <span class="cm">-- Mostrar qué se va a eliminar</span>
+    <span class="kw">SELECT</span>
+        database_name, type, backup_finish_date,
+        backup_size/<span class="num">1024</span>/<span class="num">1024</span> <span class="kw">AS</span> TamañoMB
+    <span class="kw">FROM</span>   msdb.dbo.backupset
+    <span class="kw">WHERE</span>  database_name = <span class="str">'GradosTitulos'</span>
+      <span class="kw">AND</span>  backup_finish_date < @fechaCorte;
 
-      <span class="cm">-- Limpiar catálogo de msdb</span>
-      <span class="kw">EXEC</span> msdb.dbo.<span class="fn">sp_delete_backuphistory</span>
-          @oldest_date = @fechaCorte;
+    <span class="cm">-- Limpiar catálogo de msdb</span>
+    <span class="kw">EXEC</span> msdb.dbo.<span class="fn">sp_delete_backuphistory</span>
+        @oldest_date = @fechaCorte;
 
-      <span class="cm">-- Registrar limpieza</span>
-      <span class="kw">INSERT INTO</span> <span class="tbl">dbo</span>.HistorialBackup
-          (TipoBackup, FechaEjecucion, RutaArchivo, Estado)
-      <span class="kw">VALUES</span>(
-          <span class="str">'CLEANUP'</span>, <span class="fn">GETDATE</span>(),
-          <span class="str">'Eliminados backups anteriores a: '</span> +
-          <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,@fechaCorte,<span class="num">103</span>),
-          <span class="str">'OK'</span>)
+    <span class="cm">-- Registrar limpieza</span>
+    <span class="kw">INSERT INTO</span> <span class="tbl">dbo</span>.HistorialBackup
+        (TipoBackup, FechaEjecucion, RutaArchivo, Estado)
+    <span class="kw">VALUES</span>(
+        <span class="str">'CLEANUP'</span>, <span class="fn">GETDATE</span>(),
+        <span class="str">'Eliminados backups anteriores a: '</span> +
+        <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,@fechaCorte,<span class="num">103</span>),
+        <span class="str">'OK'</span>)
 
-      <span class="fn">PRINT</span> <span class="str">'Limpieza completada para backups anteriores a: '</span>
-          + <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,@fechaCorte,<span class="num">103</span>)
-  <span class="kw">END</span></pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>sp_delete_backuphistory solo limpia msdb (catálogo), no los archivos físicos del disco.</li>
-              <li>Los archivos físicos deben eliminarse con xp_cmdshell, PowerShell o Maintenance Plan Cleanup.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Nunca eliminar el último Full disponible aunque supere los 180 días.</li>
-              <li>Mantener al menos 1 Full + Diferenciales + Logs de los últimos 30 días siempre.</li>
-              <li>Documentar la política de retención en el manual de procedimientos de TI.</li>
-            </ul>
-          </div>
+    <span class="fn">PRINT</span> <span class="str">'Limpieza completada para backups anteriores a: '</span>
+         + <span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>,@fechaCorte,<span class="num">103</span>)
+<span class="kw">END</span></pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>sp_delete_backuphistory solo limpia msdb (catálogo), no los archivos físicos del disco.</li>
+            <li>Los archivos físicos deben eliminarse con xp_cmdshell, PowerShell o Maintenance Plan Cleanup.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Nunca eliminar el último Full disponible aunque supere los 180 días.</li>
+            <li>Mantener al menos 1 Full + Diferenciales + Logs de los últimos 30 días siempre.</li>
+            <li>Documentar la política de retención en el manual de procedimientos de TI.</li>
+          </ul>
         </div>
       </div>
     </div>
-  </div><!-- /t5 -->
+  </div>
+</div><!-- /t5 -->
 
 
-  <!-- ════════════════════════════════════════
-      TEMA 6 – PUNTO EN EL TIEMPO
-  ════════════════════════════════════════ -->
-  <div id="t6" class="section">
-    <div class="infog-header h-coral">
-      <div class="icon">⏰</div>
-      <div>
-        <h2>Tema 6 · Restauración Punto en el Tiempo</h2>
-        <p>Recuperar la base de datos al estado exacto antes de un incidente</p>
-      </div>
+<!-- ════════════════════════════════════════
+     TEMA 6 – PUNTO EN EL TIEMPO
+════════════════════════════════════════ -->
+<div id="t6" class="section">
+  <div class="infog-header h-coral">
+    <div class="icon">⏰</div>
+    <div>
+      <h2>Tema 6 · Restauración Punto en el Tiempo</h2>
+      <p>Recuperar la base de datos al estado exacto antes de un incidente</p>
     </div>
+  </div>
 
-    <div class="infog-grid">
-      <div class="infog-card c-coral">
-        <span class="card-emoji">🎯</span>
-        <h3>Point-in-Time Recovery</h3>
-        <p>Restaurar la BD al estado exacto de un momento específico. Requiere modelo de recuperación FULL y logs disponibles.</p>
-        <div class="badge-row"><span class="badge b-c">STOPAT</span><span class="badge b-c">Modelo FULL</span></div>
-      </div>
-      <div class="infog-card c-coral">
-        <span class="card-emoji">🔗</span>
-        <h3>Cadena de LSN</h3>
-        <p>Log Sequence Number: identificador único de cada transacción. La cadena de LSN no debe romperse.</p>
-        <div class="badge-row"><span class="badge b-c">LSN</span><span class="badge b-c">Cadena</span></div>
-      </div>
-      <div class="infog-card c-coral">
-        <span class="card-emoji">🔬</span>
-        <h3>Identificar el Incidente</h3>
-        <p>Usar fn_dblog() para leer el log de transacciones y encontrar el LSN exacto de la operación a revertir.</p>
-        <div class="badge-row"><span class="badge b-c">fn_dblog</span><span class="badge b-c">LOP_DELETE</span></div>
-      </div>
-      <div class="infog-card c-coral">
-        <span class="card-emoji">⚡</span>
-        <h3>STOPAT / STOPATMARK</h3>
-        <p>STOPAT detiene la aplicación de logs en un timestamp. STOPATMARK lo hace en una transacción marcada.</p>
-        <div class="badge-row"><span class="badge b-c">STOPAT</span><span class="badge b-c">STOPATMARK</span></div>
-      </div>
+  <div class="infog-grid">
+    <div class="infog-card c-coral">
+      <span class="card-emoji">🎯</span>
+      <h3>Point-in-Time Recovery</h3>
+      <p>Restaurar la BD al estado exacto de un momento específico. Requiere modelo de recuperación FULL y logs disponibles.</p>
+      <div class="badge-row"><span class="badge b-c">STOPAT</span><span class="badge b-c">Modelo FULL</span></div>
     </div>
+    <div class="infog-card c-coral">
+      <span class="card-emoji">🔗</span>
+      <h3>Cadena de LSN</h3>
+      <p>Log Sequence Number: identificador único de cada transacción. La cadena de LSN no debe romperse.</p>
+      <div class="badge-row"><span class="badge b-c">LSN</span><span class="badge b-c">Cadena</span></div>
+    </div>
+    <div class="infog-card c-coral">
+      <span class="card-emoji">🔬</span>
+      <h3>Identificar el Incidente</h3>
+      <p>Usar fn_dblog() para leer el log de transacciones y encontrar el LSN exacto de la operación a revertir.</p>
+      <div class="badge-row"><span class="badge b-c">fn_dblog</span><span class="badge b-c">LOP_DELETE</span></div>
+    </div>
+    <div class="infog-card c-coral">
+      <span class="card-emoji">⚡</span>
+      <h3>STOPAT / STOPATMARK</h3>
+      <p>STOPAT detiene la aplicación de logs en un timestamp. STOPATMARK lo hace en una transacción marcada.</p>
+      <div class="badge-row"><span class="badge b-c">STOPAT</span><span class="badge b-c">STOPATMARK</span></div>
+    </div>
+  </div>
 
-    <div class="section-divider">📁 Proyectos Prácticos</div>
+  <div class="section-divider">📁 Proyectos Prácticos</div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#FA7C5B">1</div>
-        <h3>Recuperación Antes de una Eliminación Accidental (10:15 → 10:14)</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Un operador eliminó registros de expedientes a las 10:15 a.m. Restaurar la base exactamente a las 10:14 a.m.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Paso 1: Tail-log backup URGENTE (capturar log activo)</span>
-  <span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\TailLog_10h15.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY, NO_TRUNCATE;
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#FA7C5B">1</div>
+      <h3>Recuperación Antes de una Eliminación Accidental (10:15 → 10:14)</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Un operador eliminó registros de expedientes a las 10:15 a.m. Restaurar la base exactamente a las 10:14 a.m.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Paso 1: Tail-log backup URGENTE (capturar log activo)</span>
+<span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\TailLog_10h15.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY, NO_TRUNCATE;
 
-  <span class="cm">-- Paso 2: Restaurar FULL</span>
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Hoy.bak'</span>
-      <span class="kw">WITH</span> NORECOVERY, REPLACE;
+<span class="cm">-- Paso 2: Restaurar FULL</span>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Hoy.bak'</span>
+    <span class="kw">WITH</span> NORECOVERY, REPLACE;
 
-  <span class="cm">-- Paso 3: Restaurar DIFERENCIAL de esta mañana</span>
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Diff\GT_Diff_Hoy.bak'</span>
-      <span class="kw">WITH</span> NORECOVERY;
+<span class="cm">-- Paso 3: Restaurar DIFERENCIAL de esta mañana</span>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Diff\GT_Diff_Hoy.bak'</span>
+    <span class="kw">WITH</span> NORECOVERY;
 
-  <span class="cm">-- Paso 4: Aplicar LOG hasta las 10:14:59</span>
-  <span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_Hoy.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY,
-      <span class="kw2">STOPAT</span> = <span class="str">'2024-11-15 10:14:59'</span>;  <span class="cm">-- ← 1 minuto antes del incidente</span>
+<span class="cm">-- Paso 4: Aplicar LOG hasta las 10:14:59</span>
+<span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_Hoy.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY,
+    <span class="kw2">STOPAT</span> = <span class="str">'2024-11-15 10:14:59'</span>;  <span class="cm">-- ← 1 minuto antes del incidente</span>
 
-  <span class="cm">-- Paso 5: Poner en línea</span>
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">WITH RECOVERY</span>;
+<span class="cm">-- Paso 5: Poner en línea</span>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">WITH RECOVERY</span>;
 
-  <span class="cm">-- Verificar que los registros fueron recuperados</span>
-  <span class="kw">SELECT COUNT</span>(*) <span class="kw">AS</span> TotalExpedientes
-  <span class="kw">FROM</span>   <span class="tbl">Tramite</span>.ExpedienteTitulacion;</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>STOPAT aplica todas las transacciones hasta el timestamp indicado y omite las posteriores.</li>
-              <li>La precisión depende de la frecuencia de los backups de log (ideal: cada 15 min).</li>
-              <li>NORECOVERY en cada paso mantiene la BD en estado de restauración.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Practicar la restauración point-in-time en ambiente de QA mensualmente.</li>
-              <li>Anotar la hora exacta del incidente tan pronto como se detecte.</li>
-              <li>Si hay duda sobre la hora, usar STOPAT 1-2 minutos antes del incidente reportado.</li>
-            </ul>
-          </div>
+<span class="cm">-- Verificar que los registros fueron recuperados</span>
+<span class="kw">SELECT COUNT</span>(*) <span class="kw">AS</span> TotalExpedientes
+<span class="kw">FROM</span>   <span class="tbl">Tramite</span>.ExpedienteTitulacion;</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>STOPAT aplica todas las transacciones hasta el timestamp indicado y omite las posteriores.</li>
+            <li>La precisión depende de la frecuencia de los backups de log (ideal: cada 15 min).</li>
+            <li>NORECOVERY en cada paso mantiene la BD en estado de restauración.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Practicar la restauración point-in-time en ambiente de QA mensualmente.</li>
+            <li>Anotar la hora exacta del incidente tan pronto como se detecte.</li>
+            <li>Si hay duda sobre la hora, usar STOPAT 1-2 minutos antes del incidente reportado.</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#FA7C5B">4</div>
-        <h3>Recuperación Forense Institucional</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Se detectó una modificación maliciosa durante una ventana específica de tiempo. Restaurar GradosTitulos exactamente al momento anterior al incidente y documentar el procedimiento.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Paso 1: Leer el log activo para identificar la operación</span>
-  <span class="kw">SELECT TOP</span> <span class="num">20</span>
-      [Current LSN], Operation, Context,
-      [Transaction ID], [Begin Time],
-      AllocUnitName
-  <span class="kw">FROM</span>   <span class="fn">fn_dblog</span>(<span class="kw">NULL</span>, <span class="kw">NULL</span>)
-  <span class="kw">WHERE</span>  Operation <span class="kw">IN</span> (<span class="str">'LOP_INSERT_ROWS'</span>,<span class="str">'LOP_DELETE_ROWS'</span>,<span class="str">'LOP_MODIFY_ROW'</span>)
-    <span class="kw">AND</span>  AllocUnitName <span class="kw">LIKE</span> <span class="str">'Documento%'</span>
-  <span class="kw">ORDER BY</span> [Begin Time] <span class="kw">DESC</span>;
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#FA7C5B">4</div>
+      <h3>Recuperación Forense Institucional</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Se detectó una modificación maliciosa durante una ventana específica de tiempo. Restaurar GradosTitulos exactamente al momento anterior al incidente y documentar el procedimiento.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Paso 1: Leer el log activo para identificar la operación</span>
+<span class="kw">SELECT TOP</span> <span class="num">20</span>
+    [Current LSN], Operation, Context,
+    [Transaction ID], [Begin Time],
+    AllocUnitName
+<span class="kw">FROM</span>   <span class="fn">fn_dblog</span>(<span class="kw">NULL</span>, <span class="kw">NULL</span>)
+<span class="kw">WHERE</span>  Operation <span class="kw">IN</span> (<span class="str">'LOP_INSERT_ROWS'</span>,<span class="str">'LOP_DELETE_ROWS'</span>,<span class="str">'LOP_MODIFY_ROW'</span>)
+  <span class="kw">AND</span>  AllocUnitName <span class="kw">LIKE</span> <span class="str">'Documento%'</span>
+<span class="kw">ORDER BY</span> [Begin Time] <span class="kw">DESC</span>;
 
-  <span class="cm">-- Paso 2: Tail-log backup de emergencia</span>
-  <span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\TailLog_Forense.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY, NO_TRUNCATE, CHECKSUM;
+<span class="cm">-- Paso 2: Tail-log backup de emergencia</span>
+<span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\TailLog_Forense.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY, NO_TRUNCATE, CHECKSUM;
 
-  <span class="cm">-- Paso 3: Restaurar cadena hasta ANTES del incidente</span>
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Ultimo.bak'</span>
-      <span class="kw">WITH</span> NORECOVERY, REPLACE;
+<span class="cm">-- Paso 3: Restaurar cadena hasta ANTES del incidente</span>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Ultimo.bak'</span>
+    <span class="kw">WITH</span> NORECOVERY, REPLACE;
 
-  <span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_Anteayer.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY;
+<span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_Anteayer.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY;
 
-  <span class="cm">-- STOPAT: 5 minutos antes del incidente detectado</span>
-  <span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_Ayer.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY,
-      <span class="kw2">STOPAT</span> = <span class="str">'2024-11-14 23:55:00'</span>;
+<span class="cm">-- STOPAT: 5 minutos antes del incidente detectado</span>
+<span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_Ayer.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY,
+    <span class="kw2">STOPAT</span> = <span class="str">'2024-11-14 23:55:00'</span>;
 
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">WITH RECOVERY</span>;
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">WITH RECOVERY</span>;
 
-  <span class="cm">-- Documentar la recuperación</span>
-  <span class="kw">INSERT INTO</span> <span class="tbl">dbo</span>.HistorialBackup
-      (TipoBackup,FechaEjecucion,RutaArchivo,Estado)
-  <span class="kw">VALUES</span>(<span class="str">'RESTORE-PITR'</span>,<span class="fn">GETDATE</span>(),
-        <span class="str">'Restauración forense - incidente 2024-11-14'</span>,<span class="str">'OK'</span>);</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>fn_dblog() permite leer el log de transacciones activo para identificar el LSN del incidente.</li>
-              <li>LOP_MODIFY_ROW identifica filas modificadas en el log activo.</li>
-              <li>Documentar en HistorialBackup crea evidencia del proceso forense.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Involucrar al área de seguridad informática antes de restaurar en caso de ataque.</li>
-              <li>Preservar una copia del log de auditoría antes de la restauración como evidencia.</li>
-              <li>Generar un informe del incidente con: qué ocurrió, cuándo, quién y cómo se recuperó.</li>
-            </ul>
-          </div>
+<span class="cm">-- Documentar la recuperación</span>
+<span class="kw">INSERT INTO</span> <span class="tbl">dbo</span>.HistorialBackup
+    (TipoBackup,FechaEjecucion,RutaArchivo,Estado)
+<span class="kw">VALUES</span>(<span class="str">'RESTORE-PITR'</span>,<span class="fn">GETDATE</span>(),
+       <span class="str">'Restauración forense - incidente 2024-11-14'</span>,<span class="str">'OK'</span>);</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>fn_dblog() permite leer el log de transacciones activo para identificar el LSN del incidente.</li>
+            <li>LOP_MODIFY_ROW identifica filas modificadas en el log activo.</li>
+            <li>Documentar en HistorialBackup crea evidencia del proceso forense.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Involucrar al área de seguridad informática antes de restaurar en caso de ataque.</li>
+            <li>Preservar una copia del log de auditoría antes de la restauración como evidencia.</li>
+            <li>Generar un informe del incidente con: qué ocurrió, cuándo, quién y cómo se recuperó.</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="proyecto-card">
-      <div class="proyecto-header" onclick="toggleProy(this)">
-        <div class="proy-num" style="background:#FA7C5B">6</div>
-        <h3>Recuperación Forense de Modificación Maliciosa</h3>
-        <span class="proy-arrow">▼</span>
-      </div>
-      <div class="proyecto-body">
-        <div class="apartados">
-          <div class="apartado ap1">
-            <h4>📋 Enunciado</h4>
-            <p>Se detectó una modificación no autorizada en las tablas del esquema Documento relacionadas con resoluciones y diplomas. Restaurar point-in-time al estado exacto antes de la alteración.</p>
-          </div>
-          <div class="apartado ap2">
-            <h4>💻 Script T-SQL</h4>
-            <pre><span class="cm">-- Identificar transacciones sobre Documento.Resoluciones</span>
-  <span class="kw">SELECT</span>
-      [Current LSN], [Transaction ID],
-      Operation, [Begin Time],
-      AllocUnitName
-  <span class="kw">FROM</span>   <span class="fn">fn_dblog</span>(<span class="kw">NULL</span>, <span class="kw">NULL</span>)
-  <span class="kw">WHERE</span>  AllocUnitName <span class="kw">IN</span> (
-      <span class="str">'Documento.Resoluciones.PK_Resoluciones'</span>,
-      <span class="str">'Documento.Diplomas.PK_Diplomas'</span>)
-  <span class="kw">ORDER BY</span> [Begin Time] <span class="kw">DESC</span>;
+  <div class="proyecto-card">
+    <div class="proyecto-header" onclick="toggleProy(this)">
+      <div class="proy-num" style="background:#FA7C5B">6</div>
+      <h3>Recuperación Forense de Modificación Maliciosa</h3>
+      <span class="proy-arrow">▼</span>
+    </div>
+    <div class="proyecto-body">
+      <div class="apartados">
+        <div class="apartado ap1">
+          <h4>📋 Enunciado</h4>
+          <p>Se detectó una modificación no autorizada en las tablas del esquema Documento relacionadas con resoluciones y diplomas. Restaurar point-in-time al estado exacto antes de la alteración.</p>
+        </div>
+        <div class="apartado ap2">
+          <h4>💻 Script T-SQL</h4>
+          <pre><span class="cm">-- Identificar transacciones sobre Documento.Resoluciones</span>
+<span class="kw">SELECT</span>
+    [Current LSN], [Transaction ID],
+    Operation, [Begin Time],
+    AllocUnitName
+<span class="kw">FROM</span>   <span class="fn">fn_dblog</span>(<span class="kw">NULL</span>, <span class="kw">NULL</span>)
+<span class="kw">WHERE</span>  AllocUnitName <span class="kw">IN</span> (
+    <span class="str">'Documento.Resoluciones.PK_Resoluciones'</span>,
+    <span class="str">'Documento.Diplomas.PK_Diplomas'</span>)
+<span class="kw">ORDER BY</span> [Begin Time] <span class="kw">DESC</span>;
 
-  <span class="cm">-- Restaurar con STOPATMARK (si se usó BEGIN TRANSACTION ... WITH MARK)</span>
-  <span class="cm">-- O usar STOPAT con el timestamp del momento anterior al incidente</span>
+<span class="cm">-- Restaurar con STOPATMARK (si se usó BEGIN TRANSACTION ... WITH MARK)</span>
+<span class="cm">-- O usar STOPAT con el timestamp del momento anterior al incidente</span>
 
-  <span class="cm">-- Tail-log de emergencia</span>
-  <span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\TailLog_ModMaliciosa.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY, NO_TRUNCATE;
+<span class="cm">-- Tail-log de emergencia</span>
+<span class="kw">BACKUP LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">TO DISK</span> = <span class="str">'C:\Backups\Log\TailLog_ModMaliciosa.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY, NO_TRUNCATE;
 
-  <span class="cm">-- Cadena de restauración completa</span>
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Reciente.bak'</span>
-      <span class="kw">WITH</span> NORECOVERY, REPLACE;
+<span class="cm">-- Cadena de restauración completa</span>
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Full\GT_Full_Reciente.bak'</span>
+    <span class="kw">WITH</span> NORECOVERY, REPLACE;
 
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Diff\GT_Diff_Reciente.bak'</span>
-      <span class="kw">WITH</span> NORECOVERY;
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Diff\GT_Diff_Reciente.bak'</span>
+    <span class="kw">WITH</span> NORECOVERY;
 
-  <span class="cm">-- Aplicar logs hasta 1 minuto antes de la alteración</span>
-  <span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
-      <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_Reciente.trn'</span>
-      <span class="kw">WITH</span> NORECOVERY,
-      <span class="kw2">STOPAT</span> = <span class="str">'2024-11-15 11:44:59'</span>;
+<span class="cm">-- Aplicar logs hasta 1 minuto antes de la alteración</span>
+<span class="kw">RESTORE LOG</span> <span class="tbl">GradosTitulos</span>
+    <span class="kw">FROM DISK</span> = <span class="str">'C:\Backups\Log\GT_Log_Reciente.trn'</span>
+    <span class="kw">WITH</span> NORECOVERY,
+    <span class="kw2">STOPAT</span> = <span class="str">'2024-11-15 11:44:59'</span>;
 
-  <span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span> <span class="kw">WITH RECOVERY</span>;
+<span class="kw">RESTORE DATABASE</span> <span class="tbl">GradosTitulos</span> <span class="kw">WITH RECOVERY</span>;
 
-  <span class="cm">-- Validar integridad post-restauración</span>
-  <span class="kw">DBCC CHECKDB</span>(<span class="tbl">GradosTitulos</span>) <span class="kw">WITH</span> NO_INFOMSGS;</pre>
-          </div>
-          <div class="apartado ap3">
-            <h4>🔬 Justificación Técnica</h4>
-            <ul>
-              <li>fn_dblog filtra por AllocUnitName para identificar exactamente qué tablas fueron modificadas.</li>
-              <li>DBCC CHECKDB post-restauración garantiza la integridad estructural de la BD recuperada.</li>
-              <li>STOPAT 1 minuto antes del incidente asegura que no se aplica la transacción maliciosa.</li>
-            </ul>
-          </div>
-          <div class="apartado ap4">
-            <h4>💡 Buenas Prácticas</h4>
-            <ul>
-              <li>Bloquear inmediatamente la cuenta del usuario sospechoso antes de restaurar.</li>
-              <li>Conservar el archivo de auditoría como evidencia antes de cualquier restauración.</li>
-              <li>Coordinar con el área legal antes de proceder si hay sospecha de delito informático.</li>
-            </ul>
-          </div>
+<span class="cm">-- Validar integridad post-restauración</span>
+<span class="kw">DBCC CHECKDB</span>(<span class="tbl">GradosTitulos</span>) <span class="kw">WITH</span> NO_INFOMSGS;</pre>
+        </div>
+        <div class="apartado ap3">
+          <h4>🔬 Justificación Técnica</h4>
+          <ul>
+            <li>fn_dblog filtra por AllocUnitName para identificar exactamente qué tablas fueron modificadas.</li>
+            <li>DBCC CHECKDB post-restauración garantiza la integridad estructural de la BD recuperada.</li>
+            <li>STOPAT 1 minuto antes del incidente asegura que no se aplica la transacción maliciosa.</li>
+          </ul>
+        </div>
+        <div class="apartado ap4">
+          <h4>💡 Buenas Prácticas</h4>
+          <ul>
+            <li>Bloquear inmediatamente la cuenta del usuario sospechoso antes de restaurar.</li>
+            <li>Conservar el archivo de auditoría como evidencia antes de cualquier restauración.</li>
+            <li>Coordinar con el área legal antes de proceder si hay sospecha de delito informático.</li>
+          </ul>
         </div>
       </div>
     </div>
-  </div><!-- /t6 -->
+  </div>
+</div><!-- /t6 -->
 
-  </div><!-- /main -->
+</div><!-- /main -->
 
-  <footer>
-    <strong>Base de Datos II · Semana 12 – Respaldo y Recuperación</strong><br>
-    Universidad Peruana Los Andes · Facultad de Ingeniería · Mg. Ing. Raúl Fernández Bejarano
-  </footer>
+<footer>
+  <strong>Base de Datos II · Semana 12 – Respaldo y Recuperación</strong><br>
+  Universidad Peruana Los Andes · Facultad de Ingeniería · Mg. Ing. Raúl Fernández Bejarano
+</footer>
 
-  <script>
-  function showTab(id, btn) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    btn.classList.add('active');
-    window.scrollTo({top:0, behavior:'smooth'});
-  }
-  function toggleProy(header) {
-    const body  = header.nextElementSibling;
-    const arrow = header.querySelector('.proy-arrow');
-    const open  = body.classList.toggle('open');
-    arrow.classList.toggle('open', open);
-  }
-  </script>
-  </body>
-  </html>
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function toggleProy(header) {
+  const body  = header.nextElementSibling;
+  const arrow = header.querySelector('.proy-arrow');
+  const open  = body.classList.toggle('open');
+  arrow.classList.toggle('open', open);
+}
+</script>
+</body>
+</html>
