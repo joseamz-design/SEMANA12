@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 10 · Administración Esencial · Base de Datos II</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --c1:#D9E0C0;--c1d:#6E7F3D;
+  --c2:#CDDAD6;--c2d:#3E6B68;
+  --c3:#F2CDA0;--c3d:#C1652E;
+  --c4:#F2E3A8;--c4d:#A6790F;
+  --c5:#E8BCAE;--c5d:#9C3D27;
+  --c6:#DDC0C2;--c6d:#7A2E2E;
+  --c7:#DCC9AE;--c7d:#6B4226;
+  --bg:#F1E7D4;--white:#FDFAF3;
+  --dark:#2B1B12;--mid:#5A4632;--lite:#9C8770;
+  --rad:9px;--rad-sm:6px;
+  --sh:0 2px 14px rgba(64,38,16,.12);
+  --sh2:0 10px 28px rgba(64,38,16,.20);
+  --serif:'Fraunces',serif;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;background:var(--bg);color:var(--dark);overflow-x:hidden;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(110,75,40,.05) 0, transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(110,75,40,.05) 0, transparent 45%),
+    repeating-linear-gradient(0deg, rgba(90,55,25,.025) 0px, rgba(90,55,25,.025) 1px, transparent 1px, transparent 3px);
+  background-attachment:fixed;
+}
+ 
+/* ── HERO ── */
+#hero{
+  min-height:100vh;
+  background:
+    repeating-linear-gradient(178deg, rgba(0,0,0,.05) 0px, rgba(0,0,0,.05) 2px, transparent 2px, transparent 26px),
+    repeating-linear-gradient(2deg, rgba(255,255,255,.035) 0px, rgba(255,255,255,.035) 1px, transparent 1px, transparent 18px),
+    linear-gradient(150deg,#2E1F12 0%,#7A3B12 42%,#A8460E 68%,#C97B3D 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:60px 20px;position:relative;overflow:hidden;
+  box-shadow:inset 0 0 120px rgba(20,10,4,.5);
+}
+.hero-orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.4}
+.o1{width:400px;height:400px;background:#E8C468;top:-100px;right:-100px}
+.o2{width:300px;height:300px;background:#6E7F3D;bottom:-80px;left:-60px}
+.o3{width:200px;height:200px;background:#C97B3D;top:40%;left:5%}
+.hero-chip{
+  background:rgba(244,236,220,.14);border:1px solid rgba(244,236,220,.4);
+  border-radius:30px;padding:6px 20px;font-size:.72rem;font-weight:700;
+  color:#fff;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;
+  backdrop-filter:blur(8px);
+}
+#hero h1{font-family:var(--serif);font-size:clamp(2.2rem,6vw,4.4rem);font-weight:700;font-optical-sizing:auto;color:#FBF4E6;line-height:1.08;margin-bottom:14px;text-shadow:0 3px 18px rgba(0,0,0,.4)}
+#hero h1 em{font-style:italic;font-weight:600;color:#F2C879}
+.hero-desc{color:rgba(255,247,235,.85);font-size:1.05rem;max-width:520px;line-height:1.65;margin-bottom:30px}
+.hero-tags{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:40px}
+.hero-tag{background:rgba(244,236,220,.16);border:1px solid rgba(244,236,220,.4);border-radius:30px;padding:7px 16px;font-size:.78rem;font-weight:600;color:#fff}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.btn-main{background:#FBF4E6;color:#7A3B12;border:none;border-radius:8px;padding:14px 32px;font-weight:800;font-size:.92rem;cursor:pointer;transition:all .2s;font-family:inherit;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+.btn-main:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.3)}
+.btn-sec{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.5);border-radius:8px;padding:14px 32px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-sec:hover{background:rgba(255,255,255,.15)}
+ 
+/* ── NAV ── */
+#nav{
+  position:sticky;top:0;z-index:999;
+  background:rgba(255,255,255,.94);backdrop-filter:blur(14px);
+  border-bottom:1.5px solid rgba(90,55,25,.18);
+  display:flex;align-items:center;padding:0 16px;overflow-x:auto;gap:2px;
+}
+.ntab{
+  padding:15px 16px;font-size:.77rem;font-weight:700;color:var(--mid);
+  cursor:pointer;white-space:nowrap;border:none;background:none;
+  border-bottom:3px solid transparent;font-family:inherit;transition:all .2s;
+}
+.ntab:hover{color:#A8460E}
+.ntab.on{color:#A8460E;border-bottom-color:#A8460E}
+.ntab-sep{width:1px;height:20px;background:#DDD0B5;flex-shrink:0;margin:0 4px}
+ 
+/* ── SECTIONS ── */
+.sec{padding:80px 20px}
+.sec-alt{background:var(--white)}
+.wrap{max-width:1080px;margin:0 auto}
+.sec-eyebrow{font-size:.7rem;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--c2d);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sec-eyebrow::before{content:'';width:18px;height:2px;background:currentColor;display:block}
+.sec-h{font-family:var(--serif);font-size:clamp(1.7rem,3vw,2.5rem);font-weight:700;color:var(--dark);margin-bottom:8px;line-height:1.2}
+.sec-sub{color:var(--lite);font-size:.9rem;line-height:1.65;max-width:540px;margin-bottom:48px}
+ 
+/* ── INFOGRAFÍAS INDEX ── */
+.inf-index{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:56px}
+.inf-idx-btn{
+  border:none;border-radius:var(--rad-sm);padding:18px 10px;cursor:pointer;
+  font-family:inherit;font-weight:700;font-size:.78rem;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  transition:all .22s;color:var(--dark);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
+}
+.inf-idx-btn:hover{transform:translateY(-4px);box-shadow:var(--sh2)}
+.inf-idx-btn .idx-icon{font-size:1.6rem}
+.inf-idx-btn .idx-num{font-size:.65rem;font-weight:800;opacity:.55;letter-spacing:1px}
+ 
+/* ── INFOGRAFÍA PANELS ── */
+.inf-panels{display:flex;flex-direction:column;gap:32px}
+.inf-panel{
+  border-radius:12px;overflow:hidden;
+  box-shadow:var(--sh);display:none;border:1px solid rgba(90,55,25,.12);
+}
+.inf-panel.visible{display:block;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+ 
+.inf-panel-head{
+  display:flex;align-items:center;gap:16px;
+  padding:24px 28px;
+}
+.inf-panel-head .ph-icon{font-size:2rem;width:56px;height:56px;border-radius:var(--rad-sm);
+  display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.5);flex-shrink:0}
+.inf-panel-head .ph-num{font-size:.65rem;font-weight:800;opacity:.6;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.inf-panel-head h2{font-family:var(--serif);font-size:1.15rem;font-weight:700;color:var(--dark);line-height:1.3}
+.inf-panel-close{margin-left:auto;background:rgba(255,255,255,.6);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.inf-panel-close:hover{background:rgba(0,0,0,.12)}
+ 
+.inf-panel-body{padding:24px 28px 28px;background:var(--white)}
+ 
+/* concept cards */
+.concept-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+.ccard{background:var(--bg);border-radius:var(--rad-sm);padding:16px;border-left:5px solid}
+.ccard h4{font-size:.78rem;font-weight:800;margin-bottom:6px}
+.ccard p{font-size:.76rem;color:var(--mid);line-height:1.55}
+ 
+/* diagram box */
+.diagram{
+  border-radius:var(--rad-sm);padding:20px;margin:16px 0;
+  font-family:'JetBrains Mono',monospace;font-size:.75rem;
+  line-height:1.8;overflow-x:auto;
+  background:#F3E6D2;color:var(--mid);border:1.5px solid #E3D2B0;
+}
+.diagram .dh{font-weight:700;color:var(--dark);font-size:.8rem;margin-bottom:8px;font-family:'Inter',sans-serif}
+ 
+/* code */
+.cblock{background:#2A1F18;border-radius:var(--rad-sm);padding:20px;overflow-x:auto;position:relative;margin:12px 0;border:1px solid #4A3324}
+.cblock pre{font-family:'JetBrains Mono',monospace;font-size:.77rem;line-height:1.75;color:#E8DCC8;white-space:pre}
+.cblock .cb-label{position:absolute;top:10px;right:14px;font-size:.6rem;font-weight:700;color:#9C8B72;letter-spacing:1px;font-family:'Inter',sans-serif}
+.kw{color:#E8B25C;font-weight:600}
+.str{color:#9FB26B}
+.cm{color:#8C7A5E;font-style:italic}
+.fn{color:#D98C4A}
+.vr{color:#8FBFAE}
+ 
+/* ── PROJECTS INDEX ── */
+.proj-index{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:56px}
+.pidx-btn{
+  border:2px solid transparent;border-radius:var(--rad-sm);padding:16px 12px;
+  cursor:pointer;font-family:inherit;font-weight:700;font-size:.8rem;
+  display:flex;flex-direction:column;align-items:flex-start;gap:4px;
+  transition:all .22s;color:var(--dark);background:var(--white);
+  box-shadow:var(--sh);
+}
+.pidx-btn:hover{transform:translateY(-3px);box-shadow:var(--sh2);border-color:#A8460E;color:#A8460E}
+.pidx-btn .pi-num{font-family:var(--serif);font-size:1.4rem;font-weight:700;opacity:.22;line-height:1}
+.pidx-btn .pi-title{font-size:.72rem;line-height:1.35}
+ 
+/* ── PROJECT PANELS ── */
+.proj-panels{display:flex;flex-direction:column;gap:28px}
+.proj-panel{background:var(--white);border-radius:12px;box-shadow:var(--sh);overflow:hidden;display:none;border:1px solid rgba(90,55,25,.12)}
+.proj-panel.visible{display:block;animation:fadeUp .35s ease}
+.proj-panel-head{display:flex;align-items:center;gap:16px;padding:22px 26px;cursor:pointer;border-bottom:2px solid var(--bg)}
+.proj-pnum{width:44px;height:44px;border-radius:var(--rad-sm);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18),inset 0 -3px 6px rgba(0,0,0,.2)}
+.proj-panel-head h3{font-family:var(--serif);font-size:1.05rem;font-weight:600;flex:1;line-height:1.3;color:var(--dark)}
+.proj-close{margin-left:auto;background:var(--bg);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.proj-close:hover{background:#DDD0B5}
+ 
+.proj-panel-body{padding:24px 26px}
+ 
+/* structure cards */
+.struct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:18px 0}
+.sc{border-radius:var(--rad-sm);padding:18px;position:relative;overflow:hidden}
+.sc-lbl{font-size:.63rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;opacity:.65;margin-bottom:5px}
+.sc h4{font-size:.85rem;font-weight:800;margin-bottom:6px;color:var(--dark)}
+.sc p{font-size:.78rem;color:var(--mid);line-height:1.55}
+.sc.green{background:#E9EDDC;border-left:5px solid var(--c1d)}
+.sc.purple{background:#F3E6D2;border-left:5px solid var(--c2d)}
+.sc.orange{background:#FBE9DA;border-left:5px solid var(--c3d)}
+.sc.teal{background:#F0E6D8;border-left:5px solid var(--c7d)}
+.sc.pink{background:#F5E3DC;border-left:5px solid var(--c5d)}
+.sc.lime{background:#F7EFD4;border-left:5px solid var(--c4d)}
+ 
+.divline{height:1.5px;background:var(--bg);margin:20px 0}
+.tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tag{background:var(--bg);border-radius:20px;padding:4px 12px;font-size:.7rem;font-weight:700;color:var(--mid)}
+.tag.accent{background:#F0E5D2;color:#A8460E}
+ 
+/* ejercicios */
+.ej-label{font-size:.67rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--c3d);display:flex;align-items:center;gap:8px;margin:22px 0 14px}
+.ej-label::after{content:'';flex:1;height:1.5px;background:currentColor;opacity:.2}
+.ej{background:var(--bg);border-radius:var(--rad-sm);padding:16px;margin-bottom:12px;border-top:3px solid var(--c3d)}
+.ej h5{font-size:.8rem;font-weight:800;color:var(--dark);margin-bottom:5px}
+.ej p{font-size:.77rem;color:var(--mid);line-height:1.6;margin-bottom:10px}
+ 
+/* ── BACK TOP ── */
+#btt{position:fixed;bottom:22px;right:22px;z-index:998;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#A8460E,#D98E3D);border:none;color:#fff;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 16px rgba(168,70,14,.4);display:none;align-items:center;justify-content:center;transition:transform .2s}
+#btt.on{display:flex}
+#btt:hover{transform:translateY(-3px)}
+ 
+/* RESPONSIVE */
+@media(max-width:680px){
+  .concept-row{grid-template-columns:1fr}
+  .struct-grid{grid-template-columns:1fr}
+  .inf-index{grid-template-columns:repeat(4,1fr)}
+  .proj-index{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+ 
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-orb o1"></div>
+  <div class="hero-orb o2"></div>
+  <div class="hero-orb o3"></div>
+  <div class="hero-chip">📚 Base de Datos II · Semana 10</div>
+  <h1>Administración<br><em>Esencial</em> SQL Server</h1>
+  <p class="hero-desc">Gestión diaria del servidor: archivos físicos, respaldos, seguridad, monitoreo y automatización con SQL Server Agent.</p>
+  <div class="hero-tags">
+    <span class="hero-tag">👨‍🎓 Jose Moori Zegarra</span>
+    <span class="hero-tag">👨‍🏫 Mg. Ing. Raúl Fernández Bejarano</span>
+    <span class="hero-tag">🏛️ UPLA · Ciclo V</span>
+  </div>
+  <div class="hero-btns">
+    <button class="btn-main" onclick="goTo('infos')">Ver Infografías ↓</button>
+    <button class="btn-sec"  onclick="goTo('proyectos')">Ver Proyectos →</button>
+  </div>
+</section>
+ 
+<!-- ═══ NAV ═══ -->
+<nav id="nav">
+  <button class="ntab on" onclick="goTo('infos');setTab(this)">🗂 Infografías</button>
+  <div class="ntab-sep"></div>
+  <button class="ntab" onclick="goTo('proyectos');setTab(this)">🛠 Proyectos</button>
+  <div class="ntab-sep"></div>
+  <button class="ntab" onclick="openInf(0);goTo('infos');setTab(this)">1·Archivos</button>
+  <button class="ntab" onclick="openInf(1);goTo('infos');setTab(this)">2·Config</button>
+  <button class="ntab" onclick="openInf(2);goTo('infos');setTab(this)">3·Recovery</button>
+  <button class="ntab" onclick="openInf(3);goTo('infos');setTab(this)">4·Usuarios</button>
+  <button class="ntab" onclick="openInf(4);goTo('infos');setTab(this)">5·Permisos</button>
+  <button class="ntab" onclick="openInf(5);goTo('infos');setTab(this)">6·Monitor</button>
+  <button class="ntab" onclick="openInf(6);goTo('infos');setTab(this)">7·Agent</button>
+</nav>
+ 
+<!-- ═══ INFOGRAFÍAS ═══ -->
+<section class="sec" id="infos">
+<div class="wrap">
+  <div class="sec-eyebrow">7 Temas</div>
+  <h2 class="sec-h">Infografías de la Sesión</h2>
+  <p class="sec-sub">Selecciona un tema para explorar su contenido visual e interactivo.</p>
+ 
+  <!-- INDEX -->
+  <div class="inf-index">
+    <button class="inf-idx-btn" style="background:var(--c1)" onclick="openInf(0)">
+      <span class="idx-num">TEMA 01</span>
+      <span class="idx-icon">🗄️</span>
+      <span>Archivos de Datos</span>
+    </button>
+    <button class="inf-idx-btn" style="background:var(--c2)" onclick="openInf(1)">
+      <span class="idx-num">TEMA 02</span>
+      <span class="idx-icon">⚙️</span>
+      <span>Configuración BD</span>
+    </button>
+    <button class="inf-idx-btn" style="background:var(--c3)" onclick="openInf(2)">
+      <span class="idx-num">TEMA 03</span>
+      <span class="idx-icon">🔄</span>
+      <span>Recuperación</span>
+    </button>
+    <button class="inf-idx-btn" style="background:var(--c4)" onclick="openInf(3)">
+      <span class="idx-num">TEMA 04</span>
+      <span class="idx-icon">👥</span>
+      <span>Usuarios &amp; Roles</span>
+    </button>
+    <button class="inf-idx-btn" style="background:var(--c5)" onclick="openInf(4)">
+      <span class="idx-num">TEMA 05</span>
+      <span class="idx-icon">🛡️</span>
+      <span>Permisos</span>
+    </button>
+    <button class="inf-idx-btn" style="background:var(--c6)" onclick="openInf(5)">
+      <span class="idx-num">TEMA 06</span>
+      <span class="idx-icon">📊</span>
+      <span>Monitoreo</span>
+    </button>
+    <button class="inf-idx-btn" style="background:var(--c7)" onclick="openInf(6)">
+      <span class="idx-num">TEMA 07</span>
+      <span class="idx-icon">🤖</span>
+      <span>SQL Agent</span>
+    </button>
+  </div>
+ 
+  <div class="inf-panels" id="inf-panels">
+ 
+    <!-- ── PANEL 1: ARCHIVOS ── -->
+    <div class="inf-panel" id="inf-0">
+      <div class="inf-panel-head" style="background:var(--c1)">
+        <div class="ph-icon">🗄️</div>
+        <div><div class="ph-num">Tema 01</div><h2>Estructura de Almacenamiento y Archivos de Datos</h2></div>
+        <button class="inf-panel-close" onclick="closeInf(0)">✕</button>
+      </div>
+      <div class="inf-panel-body">
+        <div class="concept-row">
+          <div class="ccard" style="border-color:var(--c1d)">
+            <h4>📄 Archivo Primario (.mdf)</h4>
+            <p>Punto de entrada único de la BD. Contiene el catálogo del sistema y apunta a los demás archivos físicos.</p>
+          </div>
+          <div class="ccard" style="border-color:#5E8C6B">
+            <h4>📑 Archivo Secundario (.ndf)</h4>
+            <p>Extensión opcional. Distribuye datos en distintos discos para optimizar I/O en lecturas/escrituras concurrentes.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c3d)">
+            <h4>📋 Log de Transacciones (.ldf)</h4>
+            <p>Registra cada operación DML. Indispensable para Point-in-Time Recovery y replicación.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c2d)">
+            <h4>📦 Filegroups</h4>
+            <p>Agrupaciones lógicas de archivos físicos. Permiten colocar tablas e índices en hardware específico.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c4d)">
+            <h4>⚙️ FILEGROWTH</h4>
+            <p>Crecimiento automático del archivo. Siempre definir en MB (ej: 5MB) para evitar fragmentación física.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c7d)">
+            <h4>🔍 sys.database_files</h4>
+            <p>Vista del sistema que expone nombre lógico, ruta física, tipo, grupo y tamaño actual de cada archivo.</p>
+          </div>
+        </div>
+ 
+        <div class="diagram">
+<div class="dh">📐 Arquitectura física de GradosTitulos</div>
+┌─────────────────────────────────────────────────────┐
+│                   INSTANCIA SQL SERVER              │
+│                                                     │
+│  ┌─────────────────────────────────────────────┐   │
+│  │           BASE DE DATOS: GradosTitulos       │   │
+│  │                                              │   │
+│  │  PRIMARY (Filegroup)      IdxGroup (FG)      │   │
+│  │  ┌──────────────────┐    ┌────────────────┐  │   │
+│  │  │ GradosTitulos    │    │ GradosTitulos  │  │   │
+│  │  │ _data.mdf        │    │ _idx.ndf       │  │   │
+│  │  │ SIZE: 20 MB      │    │ SIZE: 8 MB     │  │   │
+│  │  └──────────────────┘    └────────────────┘  │   │
+│  │                                              │   │
+│  │  DocumentosGroup (FG)     LOG                │   │
+│  │  ┌──────────────────┐    ┌────────────────┐  │   │
+│  │  │ GradosTitulos    │    │ GradosTitulos  │  │   │
+│  │  │ _docdata.ndf     │    │ _log.ldf       │  │   │
+│  │  │ SIZE: 10 MB      │    │ SIZE: 6 MB     │  │   │
+│  │  └──────────────────┘    └────────────────┘  │   │
+│  └─────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────┘</div>
+ 
+        <div class="cblock">
+<span class="cb-label">T-SQL</span>
+<pre><span class="cm">-- Consultar distribución de archivos físicos</span>
+<span class="kw">USE</span> GradosTitulos; <span class="kw">GO</span>
+<span class="kw">SELECT</span>
+  df.name          <span class="kw">AS</span> NombreLogico,
+  df.physical_name <span class="kw">AS</span> RutaFisica,
+  df.type_desc     <span class="kw">AS</span> TipoArchivo,
+  fg.name          <span class="kw">AS</span> GrupoArchivos,
+  (df.size * 8) / 1024 <span class="kw">AS</span> Tamano_MB
+<span class="kw">FROM</span> sys.database_files df
+<span class="kw">LEFT JOIN</span> sys.filegroups fg
+  <span class="kw">ON</span> df.data_space_id = fg.data_space_id;</pre></div>
+      </div>
+    </div>
+ 
+    <!-- ── PANEL 2: CONFIGURACIÓN ── -->
+    <div class="inf-panel" id="inf-1">
+      <div class="inf-panel-head" style="background:var(--c2)">
+        <div class="ph-icon">⚙️</div>
+        <div><div class="ph-num">Tema 02</div><h2>Propiedades y Configuraciones de Bases de Datos</h2></div>
+        <button class="inf-panel-close" onclick="closeInf(1)">✕</button>
+      </div>
+      <div class="inf-panel-body">
+        <div class="concept-row">
+          <div class="ccard" style="border-color:var(--c2d)">
+            <h4>🌐 Collation</h4>
+            <p><strong>Modern_Spanish_CI_AS</strong> — soporta tildes, ñ y orden alfabético español. CI=case-insensitive, AS=accent-sensitive.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c1d)">
+            <h4>📊 Compat. Level</h4>
+            <p>Nivel <strong>160</strong> (SQL 2022) activa Intelligent Query Processing (IQP): joins adaptativos, feedback de memoria y paralelismo.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c7d)">
+            <h4>🛡️ PAGE_VERIFY CHECKSUM</h4>
+            <p>El motor calcula checksum al escribir y verifica al leer. Detecta corrupción de páginas en disco de forma inmediata.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c3d)">
+            <h4>📈 Auto Growth (MB)</h4>
+            <p>Crecimiento fijo en MB evita eventos bloqueantes de expansión. Porcentaje genera archivos cada vez más grandes.</p>
+          </div>
+        </div>
+ 
+        <div class="diagram">
+<div class="dh">🔄 Flujo de verificación PAGE_VERIFY CHECKSUM</div>
+  ESCRITURA                           LECTURA
+  ─────────                           ───────
+  Datos → [ Calcular Checksum ] →   [ Datos + Checksum ]
+                     ↓                       ↓
+           Página guardada en disco   [ Recalcular Checksum ]
+                                             ↓
+                                   ¿Coincide? SÍ → OK ✓
+                                             NO  → Error 824 ✗</div>
+ 
+        <div class="cblock">
+<span class="cb-label">T-SQL</span>
+<pre><span class="cm">-- Ajustar collation y nivel de compatibilidad</span>
+<span class="kw">ALTER DATABASE</span> GradosTitulos
+  <span class="kw">COLLATE</span> Modern_Spanish_CI_AS; <span class="kw">GO</span>
+ 
+<span class="kw">ALTER DATABASE</span> GradosTitulos
+  <span class="kw">SET COMPATIBILITY_LEVEL</span> = 160; <span class="kw">GO</span>
+ 
+<span class="kw">ALTER DATABASE</span> GradosTitulos
+  <span class="kw">SET PAGE_VERIFY CHECKSUM</span>; <span class="kw">GO</span>
+ 
+<span class="cm">-- Verificar configuración actual</span>
+<span class="kw">SELECT</span> name, collation_name, compatibility_level,
+       page_verify_option_desc
+<span class="kw">FROM</span>  sys.databases
+<span class="kw">WHERE</span> name = <span class="str">'GradosTitulos'</span>;</pre></div>
+      </div>
+    </div>
+ 
+    <!-- ── PANEL 3: RECOVERY ── -->
+    <div class="inf-panel" id="inf-2">
+      <div class="inf-panel-head" style="background:var(--c3)">
+        <div class="ph-icon">🔄</div>
+        <div><div class="ph-num">Tema 03</div><h2>Tipos de Recuperación (Simple, Full, Bulk-Logged)</h2></div>
+        <button class="inf-panel-close" onclick="closeInf(2)">✕</button>
+      </div>
+      <div class="inf-panel-body">
+        <div class="concept-row">
+          <div class="ccard" style="border-color:var(--c1d)">
+            <h4>🟢 SIMPLE</h4>
+            <p>Log truncado en cada CHECKPOINT automáticamente. <strong>Sin</strong> Point-in-Time Recovery. Ideal para desarrollo o BD de solo lectura.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c2d)">
+            <h4>🔵 FULL</h4>
+            <p>Registra absolutamente todo. Permite restaurar al minuto exacto antes de un fallo. Requiere LOG BACKUPs periódicos.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c3d)">
+            <h4>🟠 BULK_LOGGED</h4>
+            <p>Híbrido: minimiza el log en operaciones masivas (BULK INSERT). Mantiene Point-in-Time entre backups de log.</p>
+          </div>
+        </div>
+ 
+        <div class="diagram">
+<div class="dh">📅 Estrategia de backup recomendada (modelo FULL)</div>
+  Lunes 02:00      Lunes 08:00    Lunes 14:00    Lunes 20:00
+       │                │               │               │
+  ┌────▼────┐      ┌────▼────┐    ┌────▼────┐    ┌────▼────┐
+  │  FULL   │      │  LOG    │    │  DIFF   │    │  LOG    │
+  │ BACKUP  │─────▶│ BACKUP  │───▶│ BACKUP  │───▶│ BACKUP  │
+  └─────────┘      └─────────┘    └─────────┘    └─────────┘
+       │                                               │
+       └──────────── Recovery Point ───────────────────┘
+                   (cualquier minuto entre backups)</div>
+ 
+        <div class="cblock">
+<span class="cb-label">T-SQL</span>
+<pre><span class="cm">-- Cambiar modelo de recuperación</span>
+<span class="kw">ALTER DATABASE</span> GradosTitulos <span class="kw">SET RECOVERY SIMPLE</span>;  <span class="cm">-- desarrollo</span>
+<span class="kw">ALTER DATABASE</span> GradosTitulos <span class="kw">SET RECOVERY FULL</span>;    <span class="cm">-- producción</span>
+<span class="kw">GO</span>
+<span class="cm">-- Backup completo</span>
+<span class="kw">BACKUP DATABASE</span> GradosTitulos
+  <span class="kw">TO DISK</span> = <span class="str">'D:\Backups\GT_Full.bak'</span>
+  <span class="kw">WITH</span> COMPRESSION, STATS = 10; <span class="kw">GO</span>
+<span class="cm">-- Backup diferencial</span>
+<span class="kw">BACKUP DATABASE</span> GradosTitulos
+  <span class="kw">TO DISK</span> = <span class="str">'D:\Backups\GT_Diff.bak'</span>
+  <span class="kw">WITH DIFFERENTIAL</span>, COMPRESSION; <span class="kw">GO</span>
+<span class="cm">-- Backup del Log</span>
+<span class="kw">BACKUP LOG</span> GradosTitulos
+  <span class="kw">TO DISK</span> = <span class="str">'D:\Backups\GT_Log.bak'</span>
+  <span class="kw">WITH</span> COMPRESSION;</pre></div>
+      </div>
+    </div>
+ 
+    <!-- ── PANEL 4: USUARIOS ── -->
+    <div class="inf-panel" id="inf-3">
+      <div class="inf-panel-head" style="background:var(--c4)">
+        <div class="ph-icon">👥</div>
+        <div><div class="ph-num">Tema 04</div><h2>Administración de Usuarios y Roles de Seguridad</h2></div>
+        <button class="inf-panel-close" onclick="closeInf(3)">✕</button>
+      </div>
+      <div class="inf-panel-body">
+        <div class="diagram">
+<div class="dh">🔐 Jerarquía de seguridad SQL Server</div>
+  NIVEL INSTANCIA                     NIVEL BASE DE DATOS
+  ───────────────                     ───────────────────
+  ┌──────────────┐                    ┌──────────────────┐
+  │  LOGIN       │ ──────────────────▶│  USER            │
+  │  (Servidor)  │   FOR LOGIN        │  (Base de Datos) │
+  └──────────────┘                    └────────┬─────────┘
+                                               │ EXEC sp_addrolemember
+                                               ▼
+                                      ┌────────────────────┐
+                                      │  ROLE              │
+                                      │  db_owner          │
+                                      │  db_datareader     │
+                                      │  db_datawriter     │
+                                      │  Custom Role       │
+                                      └────────────────────┘</div>
+ 
+        <div class="concept-row">
+          <div class="ccard" style="border-color:var(--c4d)">
+            <h4>🔑 LOGIN de Servidor</h4>
+            <p>Credencial a nivel de instancia. CREATE LOGIN ... WITH PASSWORD. Punto de entrada al motor SQL Server.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c2d)">
+            <h4>👤 USER de Base de Datos</h4>
+            <p>CREATE USER ... FOR LOGIN. Vincula el login a una BD específica. Cada BD tiene su propio espacio de usuarios.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c1d)">
+            <h4>🎭 Roles Fijos del Sistema</h4>
+            <p>db_owner, db_datareader, db_datawriter, db_ddladmin. Conjuntos predefinidos de permisos listos para asignar.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c5d)">
+            <h4>🛠️ Custom Roles</h4>
+            <p>CREATE ROLE permite combinar permisos granulares según las necesidades exactas del negocio o del área institucional.</p>
+          </div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">T-SQL</span>
+<pre><span class="cm">-- Crear login + usuario + asignar rol</span>
+<span class="kw">CREATE LOGIN</span> VendedorQhatu
+  <span class="kw">WITH PASSWORD</span> = <span class="str">'Oper@Qt2026!'</span>,
+  DEFAULT_DATABASE = GradosTitulos; <span class="kw">GO</span>
+ 
+<span class="kw">USE</span> GradosTitulos; <span class="kw">GO</span>
+<span class="kw">CREATE USER</span> OperadorTramite <span class="kw">FOR LOGIN</span> VendedorQhatu;
+<span class="kw">EXEC</span> sp_addrolemember <span class="str">'db_datawriter'</span>, <span class="str">'OperadorTramite'</span>;</pre></div>
+      </div>
+    </div>
+ 
+    <!-- ── PANEL 5: PERMISOS ── -->
+    <div class="inf-panel" id="inf-4">
+      <div class="inf-panel-head" style="background:var(--c5)">
+        <div class="ph-icon">🛡️</div>
+        <div><div class="ph-num">Tema 05</div><h2>Asignación de Permisos y Políticas de Acceso</h2></div>
+        <button class="inf-panel-close" onclick="closeInf(4)">✕</button>
+      </div>
+      <div class="inf-panel-body">
+        <div class="concept-row">
+          <div class="ccard" style="border-color:var(--c1d)">
+            <h4>✅ GRANT</h4>
+            <p>Otorga un permiso. GRANT SELECT ON Tabla TO Usuario. WITH GRANT OPTION permite que el usuario lo delegue a otros.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c5d)">
+            <h4>🚫 DENY</h4>
+            <p>Bloquea explícitamente. <strong>Prevalece sobre cualquier GRANT</strong>, incluso los heredados por membresía a un rol.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c6d)">
+            <h4>↩️ REVOKE</h4>
+            <p>Elimina un GRANT o DENY previo. No garantiza denegación total si existen permisos por rol aún activos.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c7d)">
+            <h4>📋 Columna-Nivel</h4>
+            <p>GRANT SELECT ON Tabla(Col1,Col2) restringe la visibilidad a columnas específicas. Protección de datos PII.</p>
+          </div>
+        </div>
+ 
+        <div class="diagram">
+<div class="dh">⚖️ Precedencia de permisos</div>
+  DENY  &gt;  GRANT heredado por ROL  &gt;  GRANT directo
+  ════════════════════════════════════════════════════
+  Usuario sin GRANT ni DENY  →  Acceso DENEGADO (default)
+  GRANT al rol               →  Acceso PERMITIDO
+  DENY directo al usuario    →  Acceso DENEGADO (siempre gana)
+  GRANT directo al usuario   →  Acceso PERMITIDO (si no hay DENY)</div>
+ 
+        <div class="cblock">
+<span class="cb-label">T-SQL</span>
+<pre><span class="cm">-- GRANT de columnas específicas (privacidad)</span>
+<span class="kw">GRANT SELECT ON</span> Academico.Persona
+  (IdPersona, Nombres, ApellidoPaterno, Correo)
+  <span class="kw">TO</span> PracticanteSistemas; <span class="kw">GO</span>
+ 
+<span class="cm">-- DENY explícito sobre tabla sensible</span>
+<span class="kw">DENY SELECT ON</span> Tramite.Pago <span class="kw">TO</span> OperadorTramite; <span class="kw">GO</span>
+ 
+<span class="cm">-- EXECUTE sobre SP (sin acceso directo a tablas)</span>
+<span class="kw">GRANT EXECUTE ON</span> Tramite.SP_RegistrarTramite
+  <span class="kw">TO</span> OperadorTramite;</pre></div>
+      </div>
+    </div>
+ 
+    <!-- ── PANEL 6: MONITOR ── -->
+    <div class="inf-panel" id="inf-5">
+      <div class="inf-panel-head" style="background:var(--c6)">
+        <div class="ph-icon">📊</div>
+        <div><div class="ph-num">Tema 06</div><h2>Monitoreo con SQL Server Activity Monitor</h2></div>
+        <button class="inf-panel-close" onclick="closeInf(5)">✕</button>
+      </div>
+      <div class="inf-panel-body">
+        <div class="concept-row">
+          <div class="ccard" style="border-color:var(--c6d)">
+            <h4>🖥️ Activity Monitor</h4>
+            <p>Interfaz gráfica de SSMS (F8). Muestra % CPU, I/O, esperas y procesos activos en tiempo real sin escribir código.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c2d)">
+            <h4>⚡ dm_exec_query_stats</h4>
+            <p>DMV con estadísticas acumuladas de consultas en caché: CPU total, lecturas, tiempo de ejecución y conteo.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c5d)">
+            <h4>🔒 dm_exec_requests</h4>
+            <p>Procesos activos en este instante. blocking_session_id &gt; 0 identifica cadenas de bloqueo que generan timeouts.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c1d)">
+            <h4>📋 dm_db_index_usage_stats</h4>
+            <p>Uso real de índices desde último reinicio. Detecta índices sin seeks ni scans que solo consumen espacio y ralentizan DML.</p>
+          </div>
+        </div>
+ 
+        <div class="diagram">
+<div class="dh">🔍 Flujo de diagnóstico de rendimiento</div>
+  1. Activity Monitor → Identificar proceso/sesión problemático
+         ↓
+  2. sys.dm_exec_requests → Filtrar por blocking_session_id > 0
+         ↓
+  3. sys.dm_exec_query_stats → Ordenar por total_worker_time DESC
+         ↓
+  4. sys.dm_exec_sql_text → Obtener texto SQL exacto del plan
+         ↓
+  5. Acción: Optimizar query / Agregar índice / Matar sesión bloqueada</div>
+ 
+        <div class="cblock">
+<span class="cb-label">T-SQL</span>
+<pre><span class="cm">-- Top 5 consultas por CPU en GradosTitulos</span>
+<span class="kw">SELECT TOP</span> 5
+  <span class="fn">SUBSTRING</span>(st.text,1,200)         <span class="kw">AS</span> SQL_Text,
+  qs.total_worker_time / 1000      <span class="kw">AS</span> CPU_ms,
+  qs.execution_count               <span class="kw">AS</span> Ejecuciones
+<span class="kw">FROM</span> sys.dm_exec_query_stats qs
+<span class="kw">CROSS APPLY</span> sys.dm_exec_sql_text(qs.sql_handle) st
+<span class="kw">WHERE</span> st.dbid = <span class="fn">DB_ID</span>(<span class="str">'GradosTitulos'</span>)
+<span class="kw">ORDER BY</span> qs.total_worker_time <span class="kw">DESC</span>;</pre></div>
+      </div>
+    </div>
+ 
+    <!-- ── PANEL 7: AGENT ── -->
+    <div class="inf-panel" id="inf-6">
+      <div class="inf-panel-head" style="background:var(--c7)">
+        <div class="ph-icon">🤖</div>
+        <div><div class="ph-num">Tema 07</div><h2>SQL Server Agent – Tareas Automáticas</h2></div>
+        <button class="inf-panel-close" onclick="closeInf(6)">✕</button>
+      </div>
+      <div class="inf-panel-body">
+        <div class="diagram">
+<div class="dh">🤖 Arquitectura de SQL Server Agent</div>
+  ┌─────────────────────────────────────────────────┐
+  │               SQL SERVER AGENT                  │
+  │                                                 │
+  │  ┌─────────┐   ┌──────────┐   ┌─────────────┐ │
+  │  │  JOB    │   │ SCHEDULE │   │  OPERATOR   │ │
+  │  │ (Tarea) │◀──│(Cuándo?) │   │  (Email)    │ │
+  │  └────┬────┘   └──────────┘   └──────┬──────┘ │
+  │       │                               │         │
+  │  ┌────▼────┐              Notifica ───┘         │
+  │  │  STEPS  │  (T-SQL, PS, SSIS...)              │
+  │  │ Step 1  │─▶ Éxito → Step 2                  │
+  │  │ Step 2  │─▶ Fallo → Notificar / Reintentar  │
+  │  └─────────┘                                    │
+  │                                                 │
+  │  Historial almacenado en: msdb.dbo.sysjobhistory│
+  └─────────────────────────────────────────────────┘</div>
+ 
+        <div class="concept-row">
+          <div class="ccard" style="border-color:var(--c7d)">
+            <h4>⚙️ Jobs</h4>
+            <p>Unidad de automatización. Agrupa pasos (steps) que se ejecutan en secuencia con lógica condicional entre ellos.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c2d)">
+            <h4>🕐 Schedules</h4>
+            <p>Define frecuencia: diario, semanal, mensual, o al inicio del Agente. Múltiples schedules por job si es necesario.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c4d)">
+            <h4>📧 Operators</h4>
+            <p>Destinatarios de alertas: email, pager, net send. El job notifica al completar, fallar, o en ambos casos.</p>
+          </div>
+          <div class="ccard" style="border-color:var(--c3d)">
+            <h4>🔔 Alerts</h4>
+            <p>Reaccionan a errores (severity &gt;= 20), condiciones de rendimiento o eventos WMI. Pueden ejecutar un job automáticamente.</p>
+          </div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">T-SQL · msdb</span>
+<pre><span class="kw">USE</span> msdb; <span class="kw">GO</span>
+<span class="cm">-- 1. Operador para notificaciones</span>
+<span class="kw">EXEC</span> sp_add_operator
+  @name          = <span class="str">'DBA_Alertas'</span>,
+  @email_address = <span class="str">'dba@upla.edu.pe'</span>,
+  @enabled       = 1; <span class="kw">GO</span>
+<span class="cm">-- 2. Job de respaldo diario</span>
+<span class="kw">EXEC</span> sp_add_job @job_name = <span class="str">'Respaldo_Diario_GT'</span>;
+<span class="kw">EXEC</span> sp_add_jobstep
+  @job_name  = <span class="str">'Respaldo_Diario_GT'</span>,
+  @step_name = <span class="str">'Backup Full'</span>,
+  @command   = <span class="str">'BACKUP DATABASE GradosTitulos
+    TO DISK=''D:\Backups\GT_Auto.bak''
+    WITH COMPRESSION;'</span>;
+<span class="kw">EXEC</span> sp_add_schedule
+  @schedule_name      = <span class="str">'Diario_2AM'</span>,
+  @freq_type          = 4,
+  @active_start_time  = 020000;
+<span class="kw">EXEC</span> sp_attach_schedule
+  @job_name      = <span class="str">'Respaldo_Diario_GT'</span>,
+  @schedule_name = <span class="str">'Diario_2AM'</span>;</pre></div>
+      </div>
+    </div>
+ 
+  </div><!-- inf-panels -->
+</div>
+</section>
+ 
+<!-- ═══ PROYECTOS ═══ -->
+<section class="sec sec-alt" id="proyectos">
+<div class="wrap">
+  <div class="sec-eyebrow">10 Proyectos</div>
+  <h2 class="sec-h">Actividades &amp; Soluciones</h2>
+  <p class="sec-sub">Selecciona un proyecto para ver enunciado, script T-SQL, justificación y buenas prácticas.</p>
+ 
+  <!-- PROJECTS INDEX -->
+  <div class="proj-index">
+    <button class="pidx-btn" onclick="openProj(0)"><span class="pi-num">01</span><span class="pi-title">Archivos físicos GradosTitulos</span></button>
+    <button class="pidx-btn" onclick="openProj(1)"><span class="pi-num">02</span><span class="pi-title">Config. Colación &amp; Propiedades</span></button>
+    <button class="pidx-btn" onclick="openProj(2)"><span class="pi-num">03</span><span class="pi-title">Modelo Recuperación &amp; Backup</span></button>
+    <button class="pidx-btn" onclick="openProj(3)"><span class="pi-num">04</span><span class="pi-title">Roles &amp; Usuarios Seguridad</span></button>
+    <button class="pidx-btn" onclick="openProj(4)"><span class="pi-num">05</span><span class="pi-title">Permisos Granulares Académico</span></button>
+    <button class="pidx-btn" onclick="openProj(5)"><span class="pi-num">06</span><span class="pi-title">Procesos Lentos &amp; Bloqueos</span></button>
+    <button class="pidx-btn" onclick="openProj(6)"><span class="pi-num">07</span><span class="pi-title">Automatización Respaldos Agent</span></button>
+    <button class="pidx-btn" onclick="openProj(7)"><span class="pi-num">08</span><span class="pi-title">Reestructuración Esquemas</span></button>
+    <button class="pidx-btn" onclick="openProj(8)"><span class="pi-num">09</span><span class="pi-title">Auditoría Forense Triggers</span></button>
+    <button class="pidx-btn" onclick="openProj(9)"><span class="pi-num">10</span><span class="pi-title">Recuperación ante Desastres</span></button>
+  </div>
+ 
+  <div class="proj-panels" id="proj-panels">
+ 
+    <!-- ═══ P1 ═══ -->
+    <div class="proj-panel" id="proj-0">
+      <div class="proj-panel-head">
+        <div class="proj-pnum" style="background:linear-gradient(135deg,#6E7F3D,#56632F)">1</div>
+        <h3>Creación y distribución de archivos físicos de la base GradosTitulos</h3>
+        <button class="proj-close" onclick="closeProj(0)">✕</button>
+      </div>
+      <div class="proj-panel-body">
+        <div class="struct-grid">
+          <div class="sc green"><div class="sc-lbl">01 · Enunciado</div><h4>¿Qué se pide?</h4><p>Crear GradosTitulos con archivo primario, secundario para documentos históricos y log, en rutas físicas dedicadas. Validar con consulta.</p></div>
+          <div class="sc purple"><div class="sc-lbl">03 · Justificación</div><h4>¿Por qué?</h4><p>Separar filegroups aísla I/O de tablas operativas vs históricas, reduce contención y permite respaldo parcial independiente.</p></div>
+          <div class="sc teal"><div class="sc-lbl">04 · Buenas Prácticas</div><h4>Estándares aplicados</h4><p>SET SINGLE_USER antes del DROP. FILEGROWTH en MB fijo. Nomenclatura de rutas con año (BaseDatos2026\).</p></div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">Script · Proyecto 1</span>
+<pre><span class="kw">USE</span> master; <span class="kw">GO</span>
+<span class="cm">-- Limpiar si existe</span>
+<span class="kw">IF EXISTS</span>(<span class="kw">SELECT</span> 1 <span class="kw">FROM</span> sys.databases <span class="kw">WHERE</span> name=<span class="str">N'GradosTitulos'</span>)
+<span class="kw">BEGIN</span>
+  <span class="kw">ALTER DATABASE</span> GradosTitulos
+    <span class="kw">SET SINGLE_USER WITH ROLLBACK IMMEDIATE</span>;
+  <span class="kw">DROP DATABASE</span> GradosTitulos;
+<span class="kw">END</span>; <span class="kw">GO</span>
+ 
+<span class="kw">CREATE DATABASE</span> GradosTitulos
+<span class="kw">ON PRIMARY</span> (
+  NAME = GradosTitulos_Data,
+  FILENAME = <span class="str">'D:\BaseDatos2026\GradosTitulos_data.mdf'</span>,
+  SIZE=20MB, MAXSIZE=20GB, FILEGROWTH=5MB
+),
+FILEGROUP DocumentosGroup (
+  NAME = GradosTitulos_DocData,
+  FILENAME = <span class="str">'D:\BaseDatos2026\GradosTitulos_docdata.ndf'</span>,
+  SIZE=10MB, MAXSIZE=10GB, FILEGROWTH=2MB
+)
+LOG <span class="kw">ON</span> (
+  NAME = GradosTitulos_Log,
+  FILENAME = <span class="str">'D:\BaseDatos2026\GradosTitulos_log.ldf'</span>,
+  SIZE=6MB, MAXSIZE=2GB, FILEGROWTH=2MB
+); <span class="kw">GO</span>
+ 
+<span class="cm">-- Verificar distribución de archivos</span>
+<span class="kw">USE</span> GradosTitulos; <span class="kw">GO</span>
+<span class="kw">SELECT</span> df.name <span class="kw">AS</span> NombreLogico,
+       df.physical_name <span class="kw">AS</span> RutaFisica,
+       df.type_desc     <span class="kw">AS</span> TipoArchivo,
+       fg.name          <span class="kw">AS</span> GrupoArchivos,
+       (df.size*8)/1024 <span class="kw">AS</span> Tamano_MB
+<span class="kw">FROM</span>   sys.database_files df
+<span class="kw">LEFT JOIN</span> sys.filegroups fg
+  <span class="kw">ON</span>  df.data_space_id = fg.data_space_id;</pre></div>
+        <div class="ej-label">Ejercicios propuestos</div>
+        <div class="ej"><h5>1) Filegroup exclusivo para Índices (IdxGroup)</h5>
+          <div class="cblock"><pre><span class="kw">ALTER DATABASE</span> GradosTitulos <span class="kw">ADD FILEGROUP</span> IdxGroup;
+<span class="kw">ALTER DATABASE</span> GradosTitulos <span class="kw">ADD FILE</span> (
+  NAME=GradosTitulos_Idx,
+  FILENAME=<span class="str">'D:\BaseDatos2026\GradosTitulos_idx.ndf'</span>,
+  SIZE=8MB, MAXSIZE=5GB, FILEGROWTH=2MB
+) <span class="kw">TO FILEGROUP</span> IdxGroup;</pre></div></div>
+        <div class="ej"><h5>2) Espacio disponible por Filegroup</h5>
+          <div class="cblock"><pre><span class="kw">SELECT</span> fg.name, <span class="fn">SUM</span>(df.size*8.0/1024) <span class="kw">AS</span> Total_MB,
+  <span class="fn">SUM</span>(<span class="fn">FILEPROPERTY</span>(df.name,<span class="str">'SpaceUsed'</span>)*8.0/1024) <span class="kw">AS</span> Usado_MB
+<span class="kw">FROM</span> sys.database_files df
+<span class="kw">LEFT JOIN</span> sys.filegroups fg <span class="kw">ON</span> df.data_space_id=fg.data_space_id
+<span class="kw">GROUP BY</span> fg.name;</pre></div></div>
+      </div>
+    </div>
+ 
+    <!-- ═══ P2 ═══ -->
+    <div class="proj-panel" id="proj-1">
+      <div class="proj-panel-head">
+        <div class="proj-pnum" style="background:linear-gradient(135deg,#3E6B68,#2C4D4A)">2</div>
+        <h3>Ajuste de configuración y validación de propiedades de GradosTitulos</h3>
+        <button class="proj-close" onclick="closeProj(1)">✕</button>
+      </div>
+      <div class="proj-panel-body">
+        <div class="struct-grid">
+          <div class="sc purple"><div class="sc-lbl">01 · Enunciado</div><h4>¿Qué se pide?</h4><p>Modificar colación para soporte de español (tildes y ñ). Ajustar crecimiento automático del archivo primario a 20MB fijos.</p></div>
+          <div class="sc teal"><div class="sc-lbl">03 · Justificación</div><h4>¿Por qué?</h4><p>Colación incorrecta genera errores en comparaciones de strings con caracteres extendidos y ORDER BY con nombres peruanos.</p></div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">Script · Proyecto 2</span>
+<pre><span class="kw">USE</span> master; <span class="kw">GO</span>
+<span class="cm">-- Consultar estado actual</span>
+<span class="kw">SELECT</span> <span class="fn">DATABASEPROPERTYEX</span>(<span class="str">'GradosTitulos'</span>,<span class="str">'Collation'</span>) <span class="kw">AS</span> Colacion;
+<span class="kw">GO</span>
+<span class="cm">-- Cambiar colación a español</span>
+<span class="kw">ALTER DATABASE</span> GradosTitulos
+  <span class="kw">COLLATE</span> Modern_Spanish_CI_AS; <span class="kw">GO</span>
+<span class="cm">-- Elevar nivel de compatibilidad (activa IQP)</span>
+<span class="kw">ALTER DATABASE</span> GradosTitulos
+  <span class="kw">SET COMPATIBILITY_LEVEL</span> = 160; <span class="kw">GO</span>
+<span class="cm">-- Crecimiento fijo en MB para el archivo primario</span>
+<span class="kw">ALTER DATABASE</span> GradosTitulos
+  <span class="kw">MODIFY FILE</span> (NAME=GradosTitulos_Data, FILEGROWTH=20MB); <span class="kw">GO</span>
+<span class="cm">-- Verificar todo</span>
+<span class="kw">SELECT</span> name, collation_name, compatibility_level
+<span class="kw">FROM</span>  sys.databases <span class="kw">WHERE</span> name=<span class="str">'GradosTitulos'</span>;</pre></div>
+        <div class="ej-label">Ejercicios propuestos</div>
+        <div class="ej"><h5>1) Elevación de Compatibility Level</h5>
+          <div class="cblock"><pre><span class="kw">ALTER DATABASE</span> GradosTitulos
+  <span class="kw">SET COMPATIBILITY_LEVEL</span> = 160;
+<span class="cm">-- Nivel 160 = SQL Server 2022 (IQP activado)</span></pre></div></div>
+        <div class="ej"><h5>2) Activar PAGE_VERIFY CHECKSUM</h5>
+          <div class="cblock"><pre><span class="kw">ALTER DATABASE</span> GradosTitulos
+  <span class="kw">SET PAGE_VERIFY CHECKSUM</span>;
+<span class="kw">SELECT</span> name, page_verify_option_desc
+<span class="kw">FROM</span>  sys.databases <span class="kw">WHERE</span> name=<span class="str">'GradosTitulos'</span>;</pre></div></div>
+      </div>
+    </div>
+ 
+    <!-- ═══ P3 ═══ -->
+    <div class="proj-panel" id="proj-2">
+      <div class="proj-panel-head">
+        <div class="proj-pnum" style="background:linear-gradient(135deg,#C1652E,#9C4F23)">3</div>
+        <h3>Definición de modelo de recuperación y respaldo para GradosTitulos</h3>
+        <button class="proj-close" onclick="closeProj(2)">✕</button>
+      </div>
+      <div class="proj-panel-body">
+        <div class="struct-grid">
+          <div class="sc orange"><div class="sc-lbl">01 · Enunciado</div><h4>¿Qué se pide?</h4><p>Cambiar secuencialmente a SIMPLE → BULK_LOGGED → FULL. Explicar impacto de cada modelo. Ejecutar backup completo con compresión.</p></div>
+          <div class="sc green"><div class="sc-lbl">03 · Justificación</div><h4>¿Por qué FULL?</h4><p>Producción académica requiere Point-in-Time Recovery. Un fallo durante inscripciones masivas debe recuperarse al minuto exacto previo al incidente.</p></div>
+          <div class="sc teal"><div class="sc-lbl">04 · Buenas Prácticas</div><h4>Estándares</h4><p>Usar COMPRESSION en todos los backups. STATS=10 para seguimiento. Almacenar en ruta dedicada con fecha en el nombre del archivo.</p></div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">Script · Proyecto 3</span>
+<pre><span class="kw">USE</span> master; <span class="kw">GO</span>
+<span class="cm">-- Recorrer modelos de recuperación</span>
+<span class="kw">ALTER DATABASE</span> GradosTitulos <span class="kw">SET RECOVERY SIMPLE</span>;
+<span class="kw">GO</span>    <span class="cm">-- Log truncado en CHECKPOINT, sin PiTR</span>
+<span class="kw">ALTER DATABASE</span> GradosTitulos <span class="kw">SET RECOVERY BULK_LOGGED</span>;
+<span class="kw">GO</span>    <span class="cm">-- Cargas masivas mínimamente logueadas</span>
+<span class="kw">ALTER DATABASE</span> GradosTitulos <span class="kw">SET RECOVERY FULL</span>;
+<span class="kw">GO</span>    <span class="cm">-- Máxima protección, PiTR habilitado</span>
+ 
+<span class="cm">-- Backup completo (base de toda estrategia)</span>
+<span class="kw">BACKUP DATABASE</span> GradosTitulos
+  <span class="kw">TO DISK</span> = <span class="str">'D:\Backups\GradosTitulos_Full_20260628.bak'</span>
+  <span class="kw">WITH</span> COMPRESSION, STATS=10,
+       NAME=<span class="str">'Full Backup GradosTitulos 2026-06-28'</span>;
+<span class="kw">GO</span>
+<span class="cm">-- Verificar modelo final</span>
+<span class="kw">SELECT</span> name, recovery_model_desc
+<span class="kw">FROM</span>  sys.databases <span class="kw">WHERE</span> name=<span class="str">'GradosTitulos'</span>;</pre></div>
+        <div class="ej-label">Ejercicios propuestos</div>
+        <div class="ej"><h5>1) Respaldo diferencial</h5>
+          <div class="cblock"><pre><span class="kw">BACKUP DATABASE</span> GradosTitulos
+  <span class="kw">TO DISK</span>=<span class="str">'D:\Backups\GT_Diff.bak'</span>
+  <span class="kw">WITH DIFFERENTIAL</span>, COMPRESSION;</pre></div></div>
+        <div class="ej"><h5>2) Respaldo del Log de Transacciones</h5>
+          <div class="cblock"><pre><span class="kw">BACKUP LOG</span> GradosTitulos
+  <span class="kw">TO DISK</span>=<span class="str">'D:\Backups\GT_Log_0200.bak'</span>
+  <span class="kw">WITH</span> COMPRESSION, STATS=5;</pre></div></div>
+      </div>
+    </div>
+ 
+    <!-- ═══ P4 ═══ -->
+    <div class="proj-panel" id="proj-3">
+      <div class="proj-panel-head">
+        <div class="proj-pnum" style="background:linear-gradient(135deg,#A6790F,#8A6209)">4</div>
+        <h3>Implementación de roles y usuarios para seguridad en GradosTitulos</h3>
+        <button class="proj-close" onclick="closeProj(3)">✕</button>
+      </div>
+      <div class="proj-panel-body">
+        <div class="struct-grid">
+          <div class="sc lime"><div class="sc-lbl">01 · Enunciado</div><h4>¿Qué se pide?</h4><p>Crear login VendedorQhatu → usuario OperadorTramite (db_datawriter). Crear ConsultaCliente → AuditorSunedu (db_datareader).</p></div>
+          <div class="sc green"><div class="sc-lbl">03 · Justificación</div><h4>¿Por qué roles?</h4><p>Separar responsabilidades: el operador puede insertar/modificar trámites, el auditor solo lee. Mínimo privilegio por función institucional.</p></div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">Script · Proyecto 4</span>
+<pre><span class="kw">USE</span> master; <span class="kw">GO</span>
+<span class="cm">-- Login 1: flujo administrativo de trámites</span>
+<span class="kw">CREATE LOGIN</span> VendedorQhatu
+  <span class="kw">WITH PASSWORD</span>=<span class="str">'Oper@Qt2026!'</span>,
+  DEFAULT_DATABASE=GradosTitulos; <span class="kw">GO</span>
+<span class="kw">USE</span> GradosTitulos; <span class="kw">GO</span>
+<span class="kw">CREATE USER</span> OperadorTramite <span class="kw">FOR LOGIN</span> VendedorQhatu;
+<span class="kw">EXEC</span> sp_addrolemember <span class="str">'db_datawriter'</span>, <span class="str">'OperadorTramite'</span>; <span class="kw">GO</span>
+ 
+<span class="cm">-- Login 2: solo auditoría de lectura</span>
+<span class="kw">USE</span> master; <span class="kw">GO</span>
+<span class="kw">CREATE LOGIN</span> ConsultaCliente
+  <span class="kw">WITH PASSWORD</span>=<span class="str">'Audit@Sn2026!'</span>,
+  DEFAULT_DATABASE=GradosTitulos; <span class="kw">GO</span>
+<span class="kw">USE</span> GradosTitulos; <span class="kw">GO</span>
+<span class="kw">CREATE USER</span> AuditorSunedu <span class="kw">FOR LOGIN</span> ConsultaCliente;
+<span class="kw">EXEC</span> sp_addrolemember <span class="str">'db_datareader'</span>, <span class="str">'AuditorSunedu'</span>;</pre></div>
+        <div class="ej-label">Ejercicios propuestos</div>
+        <div class="ej"><h5>1) Rol personalizado para Secretaría Académica</h5>
+          <div class="cblock"><pre><span class="kw">CREATE ROLE</span> RolSecretariaAcademica;
+<span class="kw">GRANT SELECT ON SCHEMA</span>::Academico <span class="kw">TO</span> RolSecretariaAcademica;
+<span class="kw">GRANT INSERT ON</span> Tramite.Tramite <span class="kw">TO</span> RolSecretariaAcademica;</pre></div></div>
+        <div class="ej"><h5>2) DENY explícito para proteger tabla financiera</h5>
+          <div class="cblock"><pre><span class="kw">DENY SELECT ON</span> Tramite.Pago <span class="kw">TO</span> OperadorTramite;
+<span class="cm">-- DENY prevalece sobre cualquier GRANT heredado de rol</span></pre></div></div>
+      </div>
+    </div>
+ 
+    <!-- ═══ P5 ═══ -->
+    <div class="proj-panel" id="proj-4">
+      <div class="proj-panel-head">
+        <div class="proj-pnum" style="background:linear-gradient(135deg,#9C3D27,#7D311F)">5</div>
+        <h3>Configuración granular de permisos en el módulo académico</h3>
+        <button class="proj-close" onclick="closeProj(4)">✕</button>
+      </div>
+      <div class="proj-panel-body">
+        <div class="struct-grid">
+          <div class="sc pink"><div class="sc-lbl">01 · Enunciado</div><h4>¿Qué se pide?</h4><p>CoordinadorFacultad: solo SELECT sobre V_NotaFinalSustentacion. AsistenteTramite: revocar UPDATE sobre Tramite.Pago. Columnas específicas para PracticanteSistemas.</p></div>
+          <div class="sc purple"><div class="sc-lbl">03 · Justificación</div><h4>Mínimo privilegio</div><p>Cada usuario accede exactamente a lo necesario para su función. Protege datos financieros y PII sin restricciones de productividad.</p></div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">Script · Proyecto 5</span>
+<pre><span class="kw">USE</span> GradosTitulos; <span class="kw">GO</span>
+<span class="cm">-- Renombrar usuarios a nomenclatura institucional</span>
+<span class="kw">ALTER USER</span> GerenteQhatu  <span class="kw">WITH NAME</span> = CoordinadorFacultad;
+<span class="kw">ALTER USER</span> CajeroQhatu   <span class="kw">WITH NAME</span> = AsistenteTramite; <span class="kw">GO</span>
+ 
+<span class="cm">-- Solo lectura sobre vista analítica</span>
+<span class="kw">GRANT SELECT ON</span> Evaluacion.V_NotaFinalSustentacion
+  <span class="kw">TO</span> CoordinadorFacultad; <span class="kw">GO</span>
+ 
+<span class="cm">-- Revocar modificación de pagos</span>
+<span class="kw">REVOKE UPDATE ON</span> Tramite.Pago <span class="kw">FROM</span> AsistenteTramite; <span class="kw">GO</span>
+ 
+<span class="cm">-- Columnas permitidas para practicante (privacidad PII)</span>
+<span class="kw">GRANT SELECT ON</span> Academico.Persona
+  (IdPersona, Nombres, ApellidoPaterno, Correo)
+  <span class="kw">TO</span> PracticanteSistemas;</pre></div>
+        <div class="ej-label">Ejercicios propuestos</div>
+        <div class="ej"><h5>1) Verificar permisos efectivos de un usuario</h5>
+          <div class="cblock"><pre><span class="kw">EXECUTE AS USER</span> = <span class="str">'PracticanteSistemas'</span>;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> fn_my_permissions(<span class="str">'Academico.Persona'</span>,<span class="str">'OBJECT'</span>);
+<span class="kw">REVERT</span>;</pre></div></div>
+        <div class="ej"><h5>2) EXECUTE sobre SP (Ownership Chaining)</h5>
+          <div class="cblock"><pre><span class="kw">GRANT EXECUTE ON</span> Tramite.SP_RegistrarTramite
+  <span class="kw">TO</span> OperadorTramite;
+<span class="cm">-- Puede ejecutar SP sin acceso directo a las tablas base</span></pre></div></div>
+      </div>
+    </div>
+ 
+    <!-- ═══ P6 ═══ -->
+    <div class="proj-panel" id="proj-5">
+      <div class="proj-panel-head">
+        <div class="proj-pnum" style="background:linear-gradient(135deg,#7A2E2E,#5E2222)">6</div>
+        <h3>Identificación y solución de procesos lentos y bloqueos</h3>
+        <button class="proj-close" onclick="closeProj(5)">✕</button>
+      </div>
+      <div class="proj-panel-body">
+        <div class="struct-grid">
+          <div class="sc orange"><div class="sc-lbl">01 · Enunciado</div><h4>¿Qué se pide?</h4><p>Describir KPIs del Activity Monitor. Desarrollar consultas T-SQL con DMVs para rastrear bloqueos y las 5 consultas de mayor consumo de CPU.</p></div>
+          <div class="sc lime"><div class="sc-lbl">03 · Justificación</div><h4>¿Por qué DMVs?</h4><p>Las DMVs dan visibilidad en tiempo real sin herramientas externas. Son la base del diagnóstico sistemático de rendimiento en producción.</p></div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">Script · Proyecto 6</span>
+<pre><span class="cm">-- Top 5 consultas por consumo de CPU</span>
+<span class="kw">SELECT TOP</span> 5
+  <span class="fn">SUBSTRING</span>(st.text,1,200)          <span class="kw">AS</span> SQL_Text,
+  qs.total_worker_time/1000         <span class="kw">AS</span> CPU_ms,
+  qs.execution_count                <span class="kw">AS</span> Ejecuciones,
+  qs.total_elapsed_time/1000        <span class="kw">AS</span> TiempoTotal_ms
+<span class="kw">FROM</span> sys.dm_exec_query_stats qs
+<span class="kw">CROSS APPLY</span> sys.dm_exec_sql_text(qs.sql_handle) st
+<span class="kw">WHERE</span> st.dbid = <span class="fn">DB_ID</span>(<span class="str">'GradosTitulos'</span>)
+<span class="kw">ORDER BY</span> qs.total_worker_time <span class="kw">DESC</span>;
+<span class="kw">GO</span>
+<span class="cm">-- Bloqueos activos en tiempo real</span>
+<span class="kw">SELECT</span>
+  r.session_id           <span class="kw">AS</span> Sesion,
+  r.blocking_session_id  <span class="kw">AS</span> BloqueadaPor,
+  r.wait_type, r.wait_time,
+  <span class="fn">SUBSTRING</span>(st.text,1,150) <span class="kw">AS</span> ConsultaActual
+<span class="kw">FROM</span>  sys.dm_exec_requests r
+<span class="kw">CROSS APPLY</span> sys.dm_exec_sql_text(r.sql_handle) st
+<span class="kw">WHERE</span> r.blocking_session_id > 0;</pre></div>
+        <div class="ej-label">Ejercicios propuestos</div>
+        <div class="ej"><h5>1) Índices sin uso (candidatos a eliminar)</h5>
+          <div class="cblock"><pre><span class="kw">SELECT</span> OBJECT_NAME(i.object_id) <span class="kw">AS</span> Tabla,
+       i.name <span class="kw">AS</span> Indice, i.type_desc,
+       ius.user_seeks+ius.user_scans+ius.user_lookups <span class="kw">AS</span> TotalUsos
+<span class="kw">FROM</span> sys.indexes i
+<span class="kw">LEFT JOIN</span> sys.dm_db_index_usage_stats ius
+  <span class="kw">ON</span> i.object_id=ius.object_id <span class="kw">AND</span> i.index_id=ius.index_id
+  <span class="kw">AND</span> ius.database_id=<span class="fn">DB_ID</span>()
+<span class="kw">WHERE</span> i.type>0
+  <span class="kw">AND</span> ISNULL(ius.user_seeks+ius.user_scans+ius.user_lookups,0)=0;</pre></div></div>
+      </div>
+    </div>
+ 
+    <!-- ═══ P7 ═══ -->
+    <div class="proj-panel" id="proj-6">
+      <div class="proj-panel-head">
+        <div class="proj-pnum" style="background:linear-gradient(135deg,#6B4226,#4F3019)">7</div>
+        <h3>Automatización de respaldos y limpieza periódica con SQL Server Agent</h3>
+        <button class="proj-close" onclick="closeProj(6)">✕</button>
+      </div>
+      <div class="proj-panel-body">
+        <div class="struct-grid">
+          <div class="sc teal"><div class="sc-lbl">01 · Enunciado</div><h4>¿Qué se pide?</h4><p>Job 1: respaldo completo diario a las 02:00 AM. Job 2: purga semanal (domingo 03:00) de registros de auditoría con más de 15 días.</p></div>
+          <div class="sc purple"><div class="sc-lbl">03 · Justificación</div><h4>Automatización</h4><p>Elimina dependencia del factor humano en tareas críticas de mantenimiento. Garantiza ventanas de backup predecibles y auditables.</p></div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">Script · Proyecto 7</span>
+<pre><span class="kw">USE</span> msdb; <span class="kw">GO</span>
+<span class="cm">-- Operador de notificaciones</span>
+<span class="kw">EXEC</span> sp_add_operator
+  @name=<span class="str">'DBA_Alertas'</span>, @enabled=1,
+  @email_address=<span class="str">'dba@upla.edu.pe'</span>; <span class="kw">GO</span>
+ 
+<span class="cm">-- JOB 1: Respaldo diario</span>
+<span class="kw">EXEC</span> sp_add_job @job_name=<span class="str">'Respaldo_Diario_GT'</span>;
+<span class="kw">EXEC</span> sp_add_jobstep @job_name=<span class="str">'Respaldo_Diario_GT'</span>,
+  @step_name=<span class="str">'Backup Full Comprimido'</span>,
+  @command=<span class="str">'BACKUP DATABASE GradosTitulos
+    TO DISK=''D:\Backups\GT_Full_Auto.bak''
+    WITH COMPRESSION, STATS=10;'</span>;
+<span class="kw">EXEC</span> sp_add_schedule @schedule_name=<span class="str">'Diario_2AM'</span>,
+  @freq_type=4, @freq_interval=1, @active_start_time=020000;
+<span class="kw">EXEC</span> sp_attach_schedule
+  @job_name=<span class="str">'Respaldo_Diario_GT'</span>, @schedule_name=<span class="str">'Diario_2AM'</span>; <span class="kw">GO</span>
+ 
+<span class="cm">-- JOB 2: Purga semanal de registros obsoletos</span>
+<span class="kw">EXEC</span> sp_add_job @job_name=<span class="str">'Purga_Semanal_Auditoria'</span>;
+<span class="kw">EXEC</span> sp_add_jobstep @job_name=<span class="str">'Purga_Semanal_Auditoria'</span>,
+  @step_name=<span class="str">'Eliminar registros >15 días'</span>,
+  @command=<span class="str">'DELETE FROM Tramite.Observaciones
+    WHERE estado=''resuelto''
+    AND DATEDIFF(DAY,fecha_creacion,GETDATE())>15;'</span>;
+<span class="kw">EXEC</span> sp_add_schedule @schedule_name=<span class="str">'Domingo_3AM'</span>,
+  @freq_type=8, @freq_interval=1, @active_start_time=030000;
+<span class="kw">EXEC</span> sp_attach_schedule
+  @job_name=<span class="str">'Purga_Semanal_Auditoria'</span>, @schedule_name=<span class="str">'Domingo_3AM'</span>;</pre></div>
+        <div class="ej-label">Ejercicios propuestos</div>
+        <div class="ej"><h5>1) Notificar al operador cuando el job falla</h5>
+          <div class="cblock"><pre><span class="kw">EXEC</span> sp_update_job @job_name=<span class="str">'Respaldo_Diario_GT'</span>,
+  @notify_level_email=2,  <span class="cm">-- 2 = al fallar</span>
+  @notify_email_operator_name=<span class="str">'DBA_Alertas'</span>;</pre></div></div>
+        <div class="ej"><h5>2) Reconstrucción automática de índices fragmentados (&gt;30%)</h5>
+          <div class="cblock"><pre><span class="kw">DECLARE</span> <span class="vr">@obj</span> NVARCHAR(256), <span class="vr">@sql</span> NVARCHAR(MAX);
+<span class="kw">DECLARE</span> c <span class="kw">CURSOR FOR</span>
+  <span class="kw">SELECT</span> OBJECT_NAME(object_id)
+  <span class="kw">FROM</span> sys.dm_db_index_physical_stats
+    (<span class="fn">DB_ID</span>(<span class="str">'GradosTitulos'</span>),NULL,NULL,NULL,<span class="str">'LIMITED'</span>)
+  <span class="kw">WHERE</span> avg_fragmentation_in_percent>30 <span class="kw">AND</span> index_id>0;
+<span class="kw">OPEN</span> c; <span class="kw">FETCH NEXT FROM</span> c <span class="kw">INTO</span> <span class="vr">@obj</span>;
+<span class="kw">WHILE</span> @@FETCH_STATUS=0 <span class="kw">BEGIN</span>
+  <span class="kw">SET</span> <span class="vr">@sql</span>=<span class="str">'ALTER INDEX ALL ON '</span>+<span class="vr">@obj</span>+<span class="str">' REBUILD'</span>;
+  <span class="kw">EXEC</span>(<span class="vr">@sql</span>);
+  <span class="kw">FETCH NEXT FROM</span> c <span class="kw">INTO</span> <span class="vr">@obj</span>;
+<span class="kw">END</span>
+<span class="kw">CLOSE</span> c; <span class="kw">DEALLOCATE</span> c;</pre></div></div>
+      </div>
+    </div>
+ 
+    <!-- ═══ P8 ═══ -->
+    <div class="proj-panel" id="proj-7">
+      <div class="proj-panel-head">
+        <div class="proj-pnum" style="background:linear-gradient(135deg,#B5654F,#8F4D3A)">8</div>
+        <h3>Reestructuración física y alteración de esquemas en tablas</h3>
+        <button class="proj-close" onclick="closeProj(7)">✕</button>
+      </div>
+      <div class="proj-panel-body">
+        <div class="struct-grid">
+          <div class="sc pink"><div class="sc-lbl">01 · Enunciado</div><h4>¿Qué se pide?</h4><p>Agregar PrioridadAtencion (INT) a Tramite.Tramite. Eliminar columna Observaciones redundante. Ampliar NroRecibo de VARCHAR(30) a VARCHAR(60) NULL.</p></div>
+          <div class="sc orange"><div class="sc-lbl">03 · Justificación</div><h4>Evolución del esquema</h4><p>Los sistemas académicos evolucionan. ALTER TABLE permite adaptar la estructura sin recrear tablas ni perder datos existentes.</p></div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">Script · Proyecto 8</span>
+<pre><span class="kw">USE</span> GradosTitulos; <span class="kw">GO</span>
+<span class="cm">-- Agregar columna de prioridad con valor default</span>
+<span class="kw">ALTER TABLE</span> Tramite.Tramite
+  <span class="kw">ADD</span> PrioridadAtencion INT <span class="kw">NULL DEFAULT</span>(0) <span class="kw">WITH VALUES</span>; <span class="kw">GO</span>
+<span class="cm">-- Eliminar columna redundante</span>
+<span class="kw">ALTER TABLE</span> Tramite.Tramite
+  <span class="kw">DROP COLUMN</span> Observaciones; <span class="kw">GO</span>
+<span class="cm">-- Ampliar NroRecibo con soporte de nulos</span>
+<span class="kw">ALTER TABLE</span> Tramite.Pago
+  <span class="kw">ALTER COLUMN</span> NroRecibo VARCHAR(60) <span class="kw">NULL</span>; <span class="kw">GO</span>
+<span class="cm">-- Verificar estructura actualizada</span>
+<span class="kw">SELECT</span> COLUMN_NAME, DATA_TYPE,
+       CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE
+<span class="kw">FROM</span>  INFORMATION_SCHEMA.COLUMNS
+<span class="kw">WHERE</span> TABLE_SCHEMA=<span class="str">'Tramite'</span>
+  <span class="kw">AND</span> TABLE_NAME IN (<span class="str">'Tramite'</span>,<span class="str">'Pago'</span>)
+<span class="kw">ORDER BY</span> TABLE_NAME, ORDINAL_POSITION;</pre></div>
+        <div class="ej-label">Ejercicios propuestos</div>
+        <div class="ej"><h5>1) CHECK CONSTRAINT para validar monto positivo</h5>
+          <div class="cblock"><pre><span class="kw">ALTER TABLE</span> Tramite.Pago
+  <span class="kw">ADD CONSTRAINT</span> CK_Pago_MontoPositivo <span class="kw">CHECK</span> (Monto > 0);</pre></div></div>
+        <div class="ej"><h5>2) Ampliar NroRecibo y verificar nulidad</h5>
+          <div class="cblock"><pre><span class="kw">ALTER TABLE</span> Tramite.Pago
+  <span class="kw">ALTER COLUMN</span> NroRecibo VARCHAR(60) <span class="kw">NULL</span>;
+<span class="cm">-- Verifica en INFORMATION_SCHEMA.COLUMNS</span></pre></div></div>
+      </div>
+    </div>
+ 
+    <!-- ═══ P9 ═══ -->
+    <div class="proj-panel" id="proj-8">
+      <div class="proj-panel-head">
+        <div class="proj-pnum" style="background:linear-gradient(135deg,#5E8C6B,#46695A)">9</div>
+        <h3>Implementación de auditoría forense automatizada mediante Triggers</h3>
+        <button class="proj-close" onclick="closeProj(8)">✕</button>
+      </div>
+      <div class="proj-panel-body">
+        <div class="struct-grid">
+          <div class="sc teal"><div class="sc-lbl">01 · Enunciado</div><h4>¿Qué se pide?</h4><p>Crear tabla AuditoriaPersona y trigger AFTER DELETE sobre Academico.Persona. Capturar: datos eliminados, SYSTEM_USER y SYSDATETIME().</p></div>
+          <div class="sc green"><div class="sc-lbl">03 · Justificación</div><h4>Forense digital</h4><p>La protección de datos personales (Ley 29733 Perú) obliga a registrar quién eliminó qué y cuándo. Los triggers garantizan trazabilidad sin modificar el código de aplicación.</p></div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">Script · Proyecto 9</span>
+<pre><span class="kw">USE</span> GradosTitulos; <span class="kw">GO</span>
+<span class="cm">-- Tabla de auditoría forense</span>
+<span class="kw">CREATE TABLE</span> Academico.AuditoriaPersona (
+  AuditId       INT IDENTITY(1,1) <span class="kw">PRIMARY KEY</span>,
+  IdPersona     INT,
+  NombresElim   NVARCHAR(200),
+  DNIElim       VARCHAR(20),
+  UsuarioSistema NVARCHAR(128),
+  FechaHora     DATETIME2 <span class="kw">DEFAULT</span> <span class="fn">SYSDATETIME</span>()
+); <span class="kw">GO</span>
+ 
+<span class="cm">-- Trigger AFTER DELETE: captura forense</span>
+<span class="kw">CREATE TRIGGER</span> TR_Auditoria_EliminarPersona
+<span class="kw">ON</span> Academico.Persona <span class="kw">AFTER DELETE</span>
+<span class="kw">AS BEGIN</span>
+  <span class="kw">SET NOCOUNT ON</span>;
+  <span class="kw">INSERT INTO</span> Academico.AuditoriaPersona
+    (IdPersona, NombresElim, DNIElim, UsuarioSistema)
+  <span class="kw">SELECT</span> d.IdPersona,
+         d.Nombres+<span class="str">' '</span>+d.ApellidoPaterno,
+         d.DNI, <span class="fn">SYSTEM_USER</span>
+  <span class="kw">FROM</span> deleted d;
+<span class="kw">END</span>; <span class="kw">GO</span>
+ 
+<span class="cm">-- Trigger INSTEAD OF: bloqueo en fines de semana</span>
+<span class="kw">CREATE TRIGGER</span> TR_Seguridad_Horario_Docente
+<span class="kw">ON</span> Academico.Docente <span class="kw">INSTEAD OF DELETE, UPDATE</span>
+<span class="kw">AS BEGIN</span>
+  <span class="kw">IF</span> DATEPART(WEEKDAY,GETDATE()) IN (1,7)
+  <span class="kw">BEGIN</span>
+    RAISERROR(<span class="str">'Bloqueado fines de semana.'</span>,16,1);
+    <span class="kw">ROLLBACK</span>;
+  <span class="kw">END</span>
+<span class="kw">END</span>;</pre></div>
+        <div class="ej-label">Ejercicios propuestos</div>
+        <div class="ej"><h5>1) Trigger AFTER UPDATE para auditar cambios en Tramite.Pago</h5>
+          <div class="cblock"><pre><span class="kw">CREATE TRIGGER</span> TR_Auditoria_ModificarPago
+<span class="kw">ON</span> Tramite.Pago <span class="kw">AFTER UPDATE</span>
+<span class="kw">AS BEGIN</span>
+  <span class="kw">SET NOCOUNT ON</span>;
+  <span class="kw">INSERT INTO</span> Tramite.AuditoriaPago
+    (PagoId, MontoAnterior, MontoNuevo, Usuario)
+  <span class="kw">SELECT</span> i.PagoId, d.Monto, i.Monto, <span class="fn">SYSTEM_USER</span>
+  <span class="kw">FROM</span> inserted i <span class="kw">INNER JOIN</span> deleted d <span class="kw">ON</span> i.PagoId=d.PagoId
+  <span class="kw">WHERE</span> i.Monto &lt;&gt; d.Monto;
+<span class="kw">END</span>;</pre></div></div>
+      </div>
+    </div>
+ 
+    <!-- ═══ P10 ═══ -->
+    <div class="proj-panel" id="proj-9">
+      <div class="proj-panel-head">
+        <div class="proj-pnum" style="background:linear-gradient(135deg,#8A6F58,#6B5340)">10</div>
+        <h3>Simulación de recuperación ante contingencias de datos</h3>
+        <button class="proj-close" onclick="closeProj(9)">✕</button>
+      </div>
+      <div class="proj-panel-body">
+        <div class="struct-grid">
+          <div class="sc purple"><div class="sc-lbl">01 · Enunciado</div><h4>¿Qué se pide?</h4><p>Simular borrado accidental del catálogo institucional. Restaurar completamente desde el .bak del Proyecto 3. Validar integridad con DBCC CHECKDB.</p></div>
+          <div class="sc lime"><div class="sc-lbl">03 · Justificación</div><h4>Plan de contingencia</h4><p>Todo DBA debe poder ejecutar un restore completo bajo presión. Practicar el proceso en entorno controlado garantiza respuesta efectiva ante desastres reales.</p></div>
+          <div class="sc teal"><div class="sc-lbl">04 · Buenas Prácticas</div><h4>Estándares</h4><p>SINGLE_USER antes del RESTORE. WITH REPLACE para sobrescribir. MULTI_USER al finalizar. DBCC CHECKDB para validar integridad post-restauración.</p></div>
+        </div>
+        <div class="cblock">
+<span class="cb-label">Script · Proyecto 10</span>
+<pre><span class="cm">-- Simular el desastre</span>
+<span class="kw">USE</span> GradosTitulos; <span class="kw">GO</span>
+<span class="kw">DELETE FROM</span> Catalogo.EstadoTramite; <span class="cm">-- ERROR INTENCIONAL</span>
+<span class="kw">GO</span>
+ 
+<span class="cm">-- Restauración completa desde backup</span>
+<span class="kw">USE</span> master; <span class="kw">GO</span>
+<span class="kw">ALTER DATABASE</span> GradosTitulos
+  <span class="kw">SET SINGLE_USER WITH ROLLBACK IMMEDIATE</span>; <span class="kw">GO</span>
+ 
+<span class="kw">RESTORE DATABASE</span> GradosTitulos
+  <span class="kw">FROM DISK</span> = <span class="str">'D:\Backups\GradosTitulos_Full_20260628.bak'</span>
+  <span class="kw">WITH REPLACE</span>, RECOVERY, STATS=10; <span class="kw">GO</span>
+ 
+<span class="cm">-- Volver a modo multiusuario</span>
+<span class="kw">ALTER DATABASE</span> GradosTitulos <span class="kw">SET MULTI_USER</span>; <span class="kw">GO</span>
+ 
+<span class="cm">-- Verificar datos restaurados</span>
+<span class="kw">USE</span> GradosTitulos; <span class="kw">GO</span>
+<span class="kw">SELECT COUNT</span>(*) <span class="kw">AS</span> TotalEstados
+<span class="kw">FROM</span> Catalogo.EstadoTramite; <span class="kw">GO</span>
+ 
+<span class="cm">-- Auditoría de integridad post-restauración</span>
+<span class="kw">DBCC CHECKDB</span>(GradosTitulos) <span class="kw">WITH NO_INFOMSGS</span>;</pre></div>
+        <div class="ej-label">Ejercicios propuestos</div>
+        <div class="ej"><h5>1) Restauración parcial con Cross-Database Query</h5>
+          <div class="cblock"><pre><span class="cm">-- Recuperar solo tabla específica desde copia auxiliar</span>
+<span class="kw">INSERT INTO</span> GradosTitulos.Catalogo.EstadoTramite
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> GradosTitulos_Auxiliar.Catalogo.EstadoTramite
+<span class="kw">WHERE</span> IdEstado <span class="kw">NOT IN</span>
+  (<span class="kw">SELECT</span> IdEstado <span class="kw">FROM</span> GradosTitulos.Catalogo.EstadoTramite);</pre></div></div>
+        <div class="ej"><h5>2) DBCC CHECKDB completo post-restauración</h5>
+          <div class="cblock"><pre><span class="kw">DBCC CHECKDB</span>(GradosTitulos)
+  <span class="kw">WITH</span> NO_INFOMSGS, ALL_ERRORMSGS;
+<span class="cm">-- Verifica integridad estructural y lógica</span></pre></div></div>
+      </div>
+    </div>
+ 
+  </div><!-- proj-panels -->
+</div>
+</section>
+ 
+<!-- FOOTER -->
+<footer style="background:linear-gradient(135deg,#2B1B12,#4A2F1C);color:#fff;text-align:center;padding:48px 20px">
+  <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;margin-bottom:10px">📚 Base de Datos II · Semana 10</div>
+  <div style="display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin:20px 0">
+    <div><div style="font-size:1.8rem;font-weight:900;color:#D98E3D">7</div><div style="font-size:.72rem;opacity:.6">Infografías</div></div>
+    <div><div style="font-size:1.8rem;font-weight:900;color:#D98E3D">10</div><div style="font-size:.72rem;opacity:.6">Proyectos</div></div>
+    <div><div style="font-size:1.8rem;font-weight:900;color:#D98E3D">20+</div><div style="font-size:.72rem;opacity:.6">Scripts T-SQL</div></div>
+  </div>
+  <p style="opacity:.6;font-size:.85rem">👨‍🎓 Jose Moori Zegarra &nbsp;·&nbsp; 👨‍🏫 Mg. Ing. Raúl Fernández Bejarano<br>UPLA · Ing. Sistemas y Computación · Ciclo V · 2026</p>
+</footer>
+ 
+<button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+ 
+<script>
+// ── Infografías ──
+function openInf(i){
+  document.querySelectorAll('.inf-panel').forEach(p=>p.classList.remove('visible'));
+  const el=document.getElementById('inf-'+i);
+  el.classList.add('visible');
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+function closeInf(i){document.getElementById('inf-'+i).classList.remove('visible')}
+ 
+// ── Proyectos ──
+function openProj(i){
+  document.querySelectorAll('.proj-panel').forEach(p=>p.classList.remove('visible'));
+  const el=document.getElementById('proj-'+i);
+  el.classList.add('visible');
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+function closeProj(i){document.getElementById('proj-'+i).classList.remove('visible')}
+ 
+// ── Nav ──
+function goTo(id){document.getElementById(id).scrollIntoView({behavior:'smooth'})}
+function setTab(b){document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));b.classList.add('on')}
+ 
+// ── Back to top ──
+window.addEventListener('scroll',()=>{
+  document.getElementById('btt').classList.toggle('on',window.scrollY>400)
+});
+ 
+// ── Open first inf on load ──
+setTimeout(()=>openInf(0),300);
+</script>
+</body>
+</html>
